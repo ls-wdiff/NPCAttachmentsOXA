@@ -1,0 +1,13 @@
+{
+  "name": "get-stalker2-game-data",
+  "version": "1.0.0",
+  "description": "Get Stalker 2 game data from ObjPrototypes",
+  "main": "getsyntax.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node getsyntax.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}
