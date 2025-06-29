@@ -4,12 +4,10 @@ import childProcess from "node:child_process";
 const root = path.join(import.meta.dirname, "..");
 const stalkerModsPath =
   "'/home/sdwvit/MX500-900/games/SteamLibrary/steamapps/common/S.T.A.L.K.E.R. 2 Heart of Chornobyl/Stalker2/Content/Paks/~mods/'";
-const cmd = (
-  name,
-  fullName = path.join(root, name),
-  packName = `${fullName}.pak`,
-) =>
-  [
+const cmd = (name) => {
+  const fullName = path.join(root, name);
+  const packName = `${fullName}.pak`;
+  return [
     `/home/sdwvit/.cargo/bin/repak pack`,
     fullName,
     packName,
@@ -17,6 +15,7 @@ const cmd = (
     packName,
     stalkerModsPath,
   ].join(" ");
+};
 
 childProcess.execSync(cmd("GlassCannon"), {
   stdio: "inherit",
