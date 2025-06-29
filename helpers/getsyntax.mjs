@@ -6,14 +6,22 @@ import fs from "node:fs";
 // scan all local .cfg files
 const dirPath =
   "/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Stalker2/Content/GameLite";
-const dedup = (arr) => [...new Set(arr)];
+/**
+ * Removes entries from dict1 that are present in dict2.
+ * Returns a new dictionary with the remaining entries from dict1.
+ */
+const dedup = (arr1, arr2) => {
+  const set2 = new Set(arr2);
+
+  return arr1.filter((item) => !set2.has(item));
+};
 const filterPrimitives = (r) =>
   r !== "true" &&
   r !== "false" &&
   r.split("").filter((l) => l.toUpperCase() !== l.toLowerCase()).length > 2 &&
   !r.includes("_") &&
   !r.includes(" ");
-const pickTop1k = (arr) =>
+const pickTop = (arr) =>
   Object.values(
     arr.flat().reduce((mem, v) => {
       mem[v] ||= [0, v];
@@ -22,8 +30,9 @@ const pickTop1k = (arr) =>
     }, {}),
   )
     .sort((a, b) => b[0] - a[0])
-    .filter((v) => v[0] >= 4)
-    .map((v) => v[1]);
+    .filter((v) => v[0] >= 3)
+    .map((v) => v[1])
+    .sort();
 
 const readOneFile = (file) => fs.readFileSync(file, "utf8");
 
@@ -74,9 +83,12 @@ function getCfgFiles() {
 
 const res = getCfgFiles().map(readOneFile).map(parseOne);
 
-const leftParts = pickTop1k(res.map((p) => p.leftParts));
-const structs = pickTop1k(res.map((p) => p.structs));
-const rightParts = pickTop1k(res.map((parsed) => parsed.rightParts));
+const leftParts = pickTop(res.map((p) => p.leftParts));
+const structs = dedup(pickTop(res.map((p) => p.structs)), leftParts);
+const rightParts = dedup(pickTop(res.map((parsed) => parsed.rightParts)), [
+  ...structs,
+  ...leftParts,
+]);
 
 fs.writeFileSync(
   path.join(import.meta.dirname, "leftParts.txt"),
