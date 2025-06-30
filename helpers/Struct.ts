@@ -3,16 +3,7 @@
  * This is a base class for all structs.
  */
 export abstract class Struct {
-  static reservedKeys = new Set([
-    "reservedKeys",
-    "isRoot",
-    "refurl",
-    "refkey",
-    "TAB",
-    "pad",
-    "renderRef",
-    "toString",
-  ]);
+  static reservedKeys = new Set(["isRoot", "refurl", "refkey"]);
   isRoot?: boolean = false;
   refurl?: string = undefined;
   refkey?: string | number = undefined;
@@ -20,32 +11,63 @@ export abstract class Struct {
   static pad(text: string): string {
     return `${Struct.TAB}${text.replace(/\n+/g, `\n${Struct.TAB}`)}`;
   }
-
-  static detectNumber(value: string | number): value is number {
-    return typeof value === "number" || parseInt(value).toString() === value;
+  static WILDCARD = "_wildcard";
+  static isNumber(ref: string): boolean {
+    return Number.isInteger(parseInt(ref)) || typeof ref === "number";
   }
-
-  static renderRef(ref: string): string {
-    if (ref === "_" || ref === "*") {
+  static renderKeyName(ref: string): string {
+    if (`${ref}`.startsWith("_")) {
+      return Struct.renderKeyName(ref.slice(1)); // Special case for indexed structs
+    }
+    if (`${ref}`.includes("*")) {
       return "[*]"; // Special case for wildcard structs
     }
-    if (parseInt(ref).toString() === ref || typeof ref === "number") {
-      return `[${ref}]`;
+    if (Struct.isNumber(ref)) {
+      return `[${parseInt(ref)}]`;
     }
     return ref;
   }
+
+  static renderStructName(name: string): string {
+    if (name === Struct.WILDCARD) {
+      return "[*]"; // Special case for wildcard structs
+    }
+    if (Struct.isNumber(name)) {
+      return `[${parseInt(name)}]`;
+    }
+    return name;
+  }
+
+  static parseStructName(name: string): string {
+    if (name === "[*]") {
+      return Struct.WILDCARD; // Special case for wildcard structs
+    }
+    if (/\[(\d+)]/.test(name)) {
+      return `_${name.match(/\[(\d+)]/)[1]}`; // Special case for indexed structs
+    }
+    return name;
+  }
+
+  static parseKeyName(key: string): string {
+    return key;
+  }
+
+  static createDynamicClass = (name: string): new () => Struct =>
+    new Function("parent", `return class ${name} extends parent {}`)(Struct);
 
   toString(): string {
     const allKeys = Object.keys(this).filter(
       (key) => !Struct.reservedKeys.has(key),
     );
     let text: string;
-    text = this.isRoot ? `${this.constructor.name} : ` : "";
+    text = this.isRoot
+      ? `${Struct.renderStructName(this.constructor.name)} : `
+      : "";
     text += "struct.begin";
     const refs = ["refurl", "refkey"]
       .map((k) => [k, this[k]])
-      .filter(([_, v]) => v != null)
-      .map(([k, v]) => `${k}=${Struct.renderRef(v)}`)
+      .filter(([_, v]) => v !== "" && v !== undefined)
+      .map(([k, v]) => `${k}=${Struct.renderKeyName(v)}`)
       .join(";");
     if (refs) {
       text += ` {${refs}}`;
@@ -56,7 +78,7 @@ export abstract class Struct {
       .filter((k) => this[k] != null)
       .map((key) =>
         Struct.pad(
-          `${Struct.renderRef(key)} ${this[key] instanceof Struct ? ":" : "="} ${this[key]}`,
+          `${Struct.renderKeyName(key)} ${this[key] instanceof Struct ? ":" : "="}${" ".repeat(+(this[key] !== ""))}${this[key]}`,
         ),
       )
       .join("\n");
@@ -76,15 +98,9 @@ export abstract class Struct {
       if (!match) {
         throw new Error(`Invalid struct head: ${line}`);
       }
-      let name = match[1].trim();
-      if (name === "[*]") {
-        name = "_"; // Special case for wildcard structs
-      }
-      const Dummy = new Function(
-        "parent",
-        `return class ${name} extends parent {}`,
-      )(Struct);
-      const dummy = new Dummy();
+      let name = Struct.parseStructName(match[1].trim());
+
+      const dummy = new (Struct.createDynamicClass(name))();
       if (match[3]) {
         const refs = match[3]
           .split(";")
@@ -104,33 +120,52 @@ export abstract class Struct {
       return dummy as Struct;
     };
 
-    const root = parseHead(lines[0]);
-    root.isRoot = true;
-    // todo implement multiple roots
-    const walk = (current: Struct, index: number): number => {
-      while (index < lines.length) {
-        const line = lines[index].trim();
-        if (line === "struct.end") {
-          return index + 1; // Move past the end of the current struct
-        }
-        if (line.includes("struct.begin")) {
-          // This is a nested struct
-          const nestedStruct = parseHead(line);
-
-          current[nestedStruct.constructor.name] = nestedStruct;
-          index++;
-          index = walk(nestedStruct, index);
-        } else {
-          // This is a key-value pair
-          const [key, value] = line.split("=").map((s) => s.trim());
-          current[key] = Struct.detectNumber(value) ? parseInt(value) : value;
-          index++;
-        }
+    const parseKeyValue = (line: string, parent: Struct): void => {
+      const match = line.match(/^(.*?)(\s*:\s*|\s*=\s*)(.*)$/);
+      if (!match) {
+        throw new Error(`Invalid key-value pair: ${line}`);
       }
-      return index;
+      const key = Struct.parseKeyName(match[1].trim());
+      const value = match[3].trim();
+      if (parent[key] === undefined) {
+        parent[key] = value;
+      } else {
+        parent[`${key}_dupe_${index}`] = value;
+      }
     };
-    walk(root, 1);
+    let index = 0;
+    const walk = (path: Struct[] = [], roots: Struct[] = []) => {
+      if (index > lines.length - 1) {
+        return roots;
+      }
+      const current = path[path.length - 1] || null;
+      const line = lines[index++].trim();
 
-    return [root] as IntendedType[];
+      if (line.includes("struct.begin")) {
+        const newStruct = parseHead(line);
+        if (current) {
+          const key = newStruct.constructor.name;
+          if (current[key] !== undefined) {
+            current[`${key}_dupe_${index}`] = newStruct;
+          } else {
+            current[key] = newStruct;
+          }
+        } else {
+          newStruct.isRoot = true;
+          roots.push(newStruct);
+        }
+        walk([...path, newStruct], roots);
+      }
+
+      if (line.includes("struct.end")) {
+        return walk(path.slice(0, -1), roots);
+      }
+
+      if (line.includes("=") && current !== null) parseKeyValue(line, current);
+
+      return walk(path, roots);
+    };
+
+    return walk() as IntendedType[];
   }
 }

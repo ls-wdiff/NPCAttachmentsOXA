@@ -2,10 +2,15 @@ import { describe, test, expect } from "vitest";
 import { Struct } from "./Struct";
 import * as fs from "node:fs";
 
-const bigFile = fs.readFileSync(
-  "/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Stalker2/Content/GameLite/GameData/AbilityPrototypes.cfg",
-  "utf-8",
-);
+const bigFile = fs
+  .readFileSync(
+    "/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Stalker2/Content/GameLite/GameData/AbilityPrototypes.cfg",
+    "utf-8",
+  )
+  .split("\n")
+  .filter((line) => line.trim())
+  .map((line) => line.replace("\r", ""))
+  .join("\n");
 
 class ChimeraHPFix extends Struct {
   refurl = "../Chimera.cfg";
@@ -57,11 +62,39 @@ struct.end`,
     expect(Struct.pad(Struct.pad("test"))).toBe("      test");
   });
 
-  test("fromString()", () => {
-    const chimeraText = new ChimeraHPFix().toString();
+  describe("fromString()", () => {
+    test("1", () => {
+      const chimeraText = new ChimeraHPFix().toString();
 
-    expect(Struct.fromString(chimeraText).toString()).toBe(chimeraText);
+      expect(Struct.fromString(chimeraText)[0].toString()).toBe(chimeraText);
+    });
 
-    expect(Struct.fromString(bigFile).toString()).toBe(bigFile);
+    test("2", () => {
+      const complexStructText = `BasePhantomAttack : struct.begin {refkey=BaseAttackAbility}
+   TriggeredCooldowns : struct.begin
+      [0] : struct.begin
+         CooldownTag = Ability.Cooldown.RunAttack
+         Duration = 50.f
+      struct.end
+   struct.end
+   Effects : struct.begin
+      [0] : struct.begin
+         EffectPrototypeSID = MutantMediumAttackCameraShake
+         Chance = 1.f
+      struct.end
+   struct.end
+struct.end`;
+      expect(Struct.fromString(complexStructText).toString()).toBe(
+        complexStructText,
+      );
+    });
+
+    test("3", () => {
+      expect(
+        Struct.fromString(bigFile)
+          .map((s) => s.toString())
+          .join("\n"),
+      ).toBe(bigFile);
+    });
   });
 });
