@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { Struct } from "./Struct";
+import { Struct } from "./Struct.ts";
 import * as fs from "node:fs";
 
 const bigFile = fs
@@ -84,7 +84,7 @@ struct.end`,
       struct.end
    struct.end
 struct.end`;
-      expect(Struct.fromString(complexStructText).toString()).toBe(
+      expect(Struct.fromString(complexStructText)[0].toString()).toBe(
         complexStructText,
       );
     });

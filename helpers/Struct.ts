@@ -38,12 +38,12 @@ export abstract class Struct {
     return name;
   }
 
-  static parseStructName(name: string): string {
+  static parseStructName(name: string, rootClass = ""): string {
     if (name === "[*]") {
       return Struct.WILDCARD; // Special case for wildcard structs
     }
     if (/\[(\d+)]/.test(name)) {
-      return `_${name.match(/\[(\d+)]/)[1]}`; // Special case for indexed structs
+      return `${rootClass}_${name.match(/\[(\d+)]/)[1]}`; // Special case for indexed structs
     }
     return name;
   }
@@ -86,19 +86,24 @@ export abstract class Struct {
     return text;
   }
 
+  toTs(): string {
+    return JSON.stringify(this, null, 2);
+  }
+
   static fromString<IntendedType extends Struct = Struct>(
     text: string,
+    rootClass: string = "",
   ): IntendedType[] {
     const lines = text.trim().split("\n");
 
     const parseHead = (line: string): Struct => {
       const match = line.match(
-        /^(.*) : struct\.begin\s*({\s*((refurl|refkey)\s*=.+)\s*})?/,
+        /^(.*)\s*:\s*struct\.begin\s*({\s*((refurl|refkey)\s*=.+)\s*})?/,
       );
       if (!match) {
         throw new Error(`Invalid struct head: ${line}`);
       }
-      let name = Struct.parseStructName(match[1].trim());
+      let name = Struct.parseStructName(match[1].trim(), rootClass);
 
       const dummy = new (Struct.createDynamicClass(name))();
       if (match[3]) {
@@ -134,36 +139,34 @@ export abstract class Struct {
       }
     };
     let index = 0;
-    const walk = (path: Struct[] = [], roots: Struct[] = []) => {
-      if (index > lines.length - 1) {
-        return roots;
-      }
-      const current = path[path.length - 1] || null;
-      const line = lines[index++].trim();
 
-      if (line.includes("struct.begin")) {
-        const newStruct = parseHead(line);
-        if (current) {
-          const key = newStruct.constructor.name;
-          if (current[key] !== undefined) {
-            current[`${key}_dupe_${index}`] = newStruct;
+    const walk = () => {
+      const roots: Struct[] = [];
+      const stack = [];
+      while (index < lines.length) {
+        const line = lines[index++].trim();
+        const current = stack[stack.length - 1];
+        if (line.includes("struct.begin")) {
+          const newStruct = parseHead(line);
+          if (current) {
+            const key = newStruct.constructor.name;
+            if (current[key] !== undefined) {
+              current[`${key}_dupe_${index}`] = newStruct;
+            } else {
+              current[key] = newStruct;
+            }
           } else {
-            current[key] = newStruct;
+            newStruct.isRoot = true;
+            roots.push(newStruct);
           }
-        } else {
-          newStruct.isRoot = true;
-          roots.push(newStruct);
+          stack.push(newStruct);
+        } else if (line.includes("struct.end")) {
+          stack.pop();
+        } else if (line.includes("=") && current) {
+          parseKeyValue(line, current);
         }
-        walk([...path, newStruct], roots);
       }
-
-      if (line.includes("struct.end")) {
-        return walk(path.slice(0, -1), roots);
-      }
-
-      if (line.includes("=") && current !== null) parseKeyValue(line, current);
-
-      return walk(path, roots);
+      return roots;
     };
 
     return walk() as IntendedType[];
