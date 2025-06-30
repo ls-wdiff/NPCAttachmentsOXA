@@ -53,7 +53,7 @@ export abstract class Struct {
     text += "\n";
     // Add all keys
     text += allKeys
-      .filter((k) => this[k])
+      .filter((k) => this[k] != null)
       .map((key) =>
         Struct.pad(
           `${Struct.renderRef(key)} ${this[key] instanceof Struct ? ":" : "="} ${this[key]}`,
@@ -64,7 +64,9 @@ export abstract class Struct {
     return text;
   }
 
-  static fromString<IntendedType = Struct>(text: string): IntendedType {
+  static fromString<IntendedType extends Struct = Struct>(
+    text: string,
+  ): IntendedType[] {
     const lines = text.trim().split("\n");
 
     const parseHead = (line: string): Struct => {
@@ -104,8 +106,8 @@ export abstract class Struct {
 
     const root = parseHead(lines[0]);
     root.isRoot = true;
-
-    const walk = (current: Struct, lines: string[], index: number): number => {
+    // todo implement multiple roots
+    const walk = (current: Struct, index: number): number => {
       while (index < lines.length) {
         const line = lines[index].trim();
         if (line === "struct.end") {
@@ -114,9 +116,10 @@ export abstract class Struct {
         if (line.includes("struct.begin")) {
           // This is a nested struct
           const nestedStruct = parseHead(line);
+
           current[nestedStruct.constructor.name] = nestedStruct;
           index++;
-          index = walk(nestedStruct, lines, index);
+          index = walk(nestedStruct, index);
         } else {
           // This is a key-value pair
           const [key, value] = line.split("=").map((s) => s.trim());
@@ -126,8 +129,8 @@ export abstract class Struct {
       }
       return index;
     };
-    walk(root, lines, 1);
+    walk(root, 1);
 
-    return root as IntendedType;
+    return [root] as IntendedType[];
   }
 }

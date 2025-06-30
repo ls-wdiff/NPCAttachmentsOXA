@@ -1,5 +1,12 @@
 import { describe, test, expect } from "vitest";
 import { Struct } from "./Struct";
+import * as fs from "node:fs";
+
+const bigFile = fs.readFileSync(
+  "/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Stalker2/Content/GameLite/GameData/AbilityPrototypes.cfg",
+  "utf-8",
+);
+
 class ChimeraHPFix extends Struct {
   refurl = "../Chimera.cfg";
   refkey = "Chimera.VitalParams";
@@ -54,5 +61,7 @@ struct.end`,
     const chimeraText = new ChimeraHPFix().toString();
 
     expect(Struct.fromString(chimeraText).toString()).toBe(chimeraText);
+
+    expect(Struct.fromString(bigFile).toString()).toBe(bigFile);
   });
 });
