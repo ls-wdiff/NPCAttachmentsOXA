@@ -84,35 +84,26 @@ function getCfgFiles() {
   return cfgFiles;
 }
 const MOD_NAME = "MyMod";
-const InterestingFiles = ["FlashlightPrototypes.cfg"];
+const interestingFiles = ["FlashlightPrototypes.cfg"];
 const res = getCfgFiles()
-  .filter((file) => InterestingFiles.some((i) => file.includes(i)))
+  .filter((file) => interestingFiles.some((i) => file.includes(i)))
   .map((file) => {
     console.log(`Parsing ${file}`);
     const pathToSave = path.parse(
       file.slice(path.join(rootDir, dirPath).length + 1),
     );
-    const structs = Struct.fromString(readOneFile(file), pathToSave.name);
 
     const modFileRoot = path.join(rootDir, MOD_NAME, dirPath);
-    if (!fs.existsSync(modFileRoot)) {
-      fs.mkdirSync(modFileRoot, { recursive: true });
+    const modFileDir = path.join(modFileRoot, pathToSave.dir, pathToSave.name);
+    if (!fs.existsSync(modFileDir)) {
+      fs.mkdirSync(modFileDir, { recursive: true });
     }
-
-    structs.forEach((s) => {
-      const modFileDir = path.join(
-        modFileRoot,
-        pathToSave.dir,
-        pathToSave.name,
-      );
-      if (!fs.existsSync(modFileDir)) {
-        fs.mkdirSync(modFileDir, { recursive: true });
-      }
-      fs.writeFileSync(
-        path.join(modFileDir, `${s.constructor.name}.ts`),
-        `export const ${s.constructor.name} = ${s.toTs()}`,
-      );
-    });
+    fs.copyFileSync(file, path.join(modFileDir, pathToSave.base));
+    /*
+    fs.writeFileSync(
+      path.join(modFileDir, `${pathToSave.name}.json`),
+      `[${Struct.fromString(readOneFile(file)).map((s) => s.toTs()).join(",\n")}]`,
+    );*/
   });
 
 /*

@@ -3,10 +3,12 @@
  * This is a base class for all structs.
  */
 export abstract class Struct {
-  static reservedKeys = new Set(["isRoot", "refurl", "refkey"]);
-  isRoot?: boolean = false;
+  static reservedKeys = new Set(["isRoot", "refurl", "refkey", "_id"]);
+  isRoot?: boolean;
   refurl?: string = undefined;
   refkey?: string | number = undefined;
+  abstract _id: string;
+
   static TAB = "   ";
   static pad(text: string): string {
     return `${Struct.TAB}${text.replace(/\n+/g, `\n${Struct.TAB}`)}`;
@@ -32,18 +34,21 @@ export abstract class Struct {
     if (name === Struct.WILDCARD) {
       return "[*]"; // Special case for wildcard structs
     }
+    if (`${name}`.startsWith("_")) {
+      return Struct.renderStructName(name.slice(1)); // Special case for indexed structs
+    }
     if (Struct.isNumber(name)) {
       return `[${parseInt(name)}]`;
     }
     return name;
   }
 
-  static parseStructName(name: string, rootClass = ""): string {
+  static parseStructName(name: string): string {
     if (name === "[*]") {
       return Struct.WILDCARD; // Special case for wildcard structs
     }
     if (/\[(\d+)]/.test(name)) {
-      return `${rootClass}_${name.match(/\[(\d+)]/)[1]}`; // Special case for indexed structs
+      return `_${name.match(/\[(\d+)]/)[1]}`; // Special case for indexed structs
     }
     return name;
   }
@@ -92,7 +97,6 @@ export abstract class Struct {
 
   static fromString<IntendedType extends Struct = Struct>(
     text: string,
-    rootClass: string = "",
   ): IntendedType[] {
     const lines = text.trim().split("\n");
 
@@ -103,9 +107,12 @@ export abstract class Struct {
       if (!match) {
         throw new Error(`Invalid struct head: ${line}`);
       }
-      let name = Struct.parseStructName(match[1].trim(), rootClass);
+      let name = Struct.parseStructName(match[1].trim());
 
       const dummy = new (Struct.createDynamicClass(name))();
+      if (name === match[1].trim()) {
+        dummy["__proto__"]._id = name;
+      }
       if (match[3]) {
         const refs = match[3]
           .split(";")
@@ -149,14 +156,14 @@ export abstract class Struct {
         if (line.includes("struct.begin")) {
           const newStruct = parseHead(line);
           if (current) {
-            const key = newStruct.constructor.name;
+            const key = Struct.renderStructName(newStruct.constructor.name);
             if (current[key] !== undefined) {
               current[`${key}_dupe_${index}`] = newStruct;
             } else {
               current[key] = newStruct;
             }
           } else {
-            newStruct.isRoot = true;
+            newStruct["__proto__"].isRoot = true;
             roots.push(newStruct);
           }
           stack.push(newStruct);
