@@ -83,8 +83,8 @@ function getCfgFiles() {
   });
   return cfgFiles;
 }
-const MOD_NAME = "MyMod";
-const interestingFiles = ["FlashlightPrototypes.cfg"];
+const MOD_NAME = "GlassCannon";
+const interestingFiles = ["ALifeDirectorScenarioPrototypes.cfg"];
 const res = getCfgFiles()
   .filter((file) => interestingFiles.some((i) => file.includes(i)))
   .map((file) => {
@@ -98,7 +98,16 @@ const res = getCfgFiles()
     if (!fs.existsSync(modFileDir)) {
       fs.mkdirSync(modFileDir, { recursive: true });
     }
-    fs.copyFileSync(file, path.join(modFileDir, pathToSave.base));
+    const structs = Struct.fromString(readOneFile(file)).map((s) => {
+      s.refurl = "../" + pathToSave.base;
+      s.refkey = s._id;
+      s._id = MOD_NAME + s._id;
+      return s.toString();
+    });
+    fs.writeFileSync(
+      path.join(modFileDir, `${MOD_NAME}${pathToSave.base}`),
+      structs.join("\n\n"),
+    );
     /*
     fs.writeFileSync(
       path.join(modFileDir, `${pathToSave.name}.json`),

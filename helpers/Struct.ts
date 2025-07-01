@@ -65,8 +65,8 @@ export abstract class Struct {
       (key) => !Struct.reservedKeys.has(key),
     );
     let text: string;
-    text = this.isRoot
-      ? `${Struct.renderStructName(this.constructor.name)} : `
+    text = this["__proto__"].isRoot
+      ? `${Struct.renderStructName(this._id)} : `
       : "";
     text += "struct.begin";
     const refs = ["refurl", "refkey"]
@@ -111,7 +111,7 @@ export abstract class Struct {
 
       const dummy = new (Struct.createDynamicClass(name))();
       if (name === match[1].trim()) {
-        dummy["__proto__"]._id = name;
+        dummy._id = name;
       }
       if (match[3]) {
         const refs = match[3]
