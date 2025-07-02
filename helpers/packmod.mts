@@ -1,7 +1,7 @@
 import path from "node:path";
 import childProcess from "node:child_process";
 
-const root = path.join(import.meta.dirname, "..");
+const root = path.join(import.meta.dirname, "../Mods");
 const stalkerModsPath =
   "'/home/sdwvit/MX500-900/games/SteamLibrary/steamapps/common/S.T.A.L.K.E.R. 2 Heart of Chornobyl/Stalker2/Content/Paks/~mods/'";
 const cmd = (name) => {

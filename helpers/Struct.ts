@@ -1,13 +1,16 @@
+type Value = Struct | string | number;
+
 /**
  * This file is part of the Stalker 2 Modding Tools project.
  * This is a base class for all structs.
  */
 export abstract class Struct {
-  static reservedKeys = new Set(["isRoot", "refurl", "refkey", "_id"]);
   isRoot?: boolean;
   refurl?: string = undefined;
   refkey?: string | number = undefined;
+  bskipref?: boolean = false;
   abstract _id: string;
+  entries: Record<string, Value> | Value[];
 
   static TAB = "   ";
   static pad(text: string): string {
@@ -17,11 +20,14 @@ export abstract class Struct {
   static isNumber(ref: string): boolean {
     return Number.isInteger(parseInt(ref)) || typeof ref === "number";
   }
-  static renderKeyName(ref: string): string {
+  static isArrayKey(key: string) {
+    return key.includes("[") && key.includes("]");
+  }
+  static renderKeyName(ref: string, useAsterisk?: boolean): string {
     if (`${ref}`.startsWith("_")) {
-      return Struct.renderKeyName(ref.slice(1)); // Special case for indexed structs
+      return Struct.renderKeyName(ref.slice(1), useAsterisk); // Special case for indexed structs
     }
-    if (`${ref}`.includes("*")) {
+    if (`${ref}`.includes("*") || useAsterisk) {
       return "[*]"; // Special case for wildcard structs
     }
     if (`${ref}`.includes("_dupe_")) {
@@ -46,47 +52,48 @@ export abstract class Struct {
     return name;
   }
 
+  static extractKeyFromBrackets(key: string) {
+    if (/\[(.+)]/.test(key)) {
+      return key.match(/\[(.+)]/)[1];
+    }
+    return "";
+  }
+
   static parseStructName(name: string): string {
-    if (name === "[*]") {
+    if (Struct.extractKeyFromBrackets(name) === "*") {
       return Struct.WILDCARD; // Special case for wildcard structs
     }
-    if (/\[(\d+)]/.test(name)) {
+    if (Struct.isNumber(Struct.extractKeyFromBrackets(name))) {
       return `_${name.match(/\[(\d+)]/)[1]}`; // Special case for indexed structs
     }
     return name;
-  }
-
-  static parseKeyName(key: string): string {
-    return key;
   }
 
   static createDynamicClass = (name: string): new () => Struct =>
     new Function("parent", `return class ${name} extends parent {}`)(Struct);
 
   toString(): string {
-    const allKeys = Object.keys(this).filter(
-      (key) => !Struct.reservedKeys.has(key),
-    );
     let text: string;
-    text = this["__proto__"].isRoot
-      ? `${Struct.renderStructName(this._id)} : `
-      : "";
+    text = this.isRoot ? `${Struct.renderStructName(this._id)} : ` : "";
     text += "struct.begin";
-    const refs = ["refurl", "refkey"]
+    const refs = ["refurl", "refkey", "bskipref"]
       .map((k) => [k, this[k]])
-      .filter(([_, v]) => v !== "" && v !== undefined)
-      .map(([k, v]) => `${k}=${Struct.renderKeyName(v)}`)
+      .filter(([_, v]) => v !== "" && v !== undefined && v !== false)
+      .map(([k, v]) => {
+        if (v === true) return k;
+        return `${k}=${Struct.renderKeyName(v)}`;
+      })
       .join(";");
     if (refs) {
       text += ` {${refs}}`;
     }
     text += "\n";
     // Add all keys
-    text += allKeys
-      .filter((k) => this[k] != null)
-      .map((key) =>
+    text += Object.entries(this.entries)
+      .filter(([key]) => key !== "_useAsterisk")
+      .map(([key, value]) =>
         Struct.pad(
-          `${Struct.renderKeyName(key)} ${this[key] instanceof Struct ? ":" : "="}${" ".repeat(+(this[key] !== ""))}${this[key]}`,
+          `${Struct.renderKeyName(key, this.entries["_useAsterisk"])} ${value instanceof Struct ? ":" : "="}${" ".repeat(+(value !== ""))}${value}`,
         ),
       )
       .join("\n");
@@ -98,12 +105,29 @@ export abstract class Struct {
     return JSON.stringify(this, null, 2);
   }
 
+  static addEntry(parent: Struct, key: string, value: Value, index: number) {
+    if (Struct.isArrayKey(key)) {
+      parent.entries ||= [];
+      if (Struct.extractKeyFromBrackets(key) === "*") {
+        parent.entries["_useAsterisk"] = true;
+      }
+      (parent.entries as Value[]).push(value);
+    } else {
+      parent.entries ||= {};
+      if (parent.entries[key] === undefined) {
+        parent.entries[key] = value;
+      } else {
+        parent.entries[`${key}_dupe_${index}`] = value;
+      }
+    }
+  }
+
   static fromString<IntendedType = Struct>(text: string): IntendedType[] {
     const lines = text.trim().split("\n");
 
     const parseHead = (line: string): Struct => {
       const match = line.match(
-        /^(.*)\s*:\s*struct\.begin\s*({\s*((refurl|refkey)\s*=.+)\s*})?/,
+        /^(.*)\s*:\s*struct\.begin\s*({\s*((refurl|refkey|bskipref)\s*(=.+)?)\s*})?/,
       );
       if (!match) {
         throw new Error(`Invalid struct head: ${line}`);
@@ -122,13 +146,14 @@ export abstract class Struct {
           .reduce(
             (acc, ref) => {
               const [key, value] = ref.split("=");
-              acc[key.trim()] = value.trim();
+              acc[key.trim()] = value ? value.trim() : true;
               return acc;
             },
-            {} as Record<string, string>,
+            {} as { refurl?: string; refkey?: string; bskipref?: boolean },
           );
         dummy.refurl = refs.refurl;
         dummy.refkey = refs.refkey;
+        dummy.bskipref = refs.bskipref;
       }
       return dummy as Struct;
     };
@@ -138,13 +163,9 @@ export abstract class Struct {
       if (!match) {
         throw new Error(`Invalid key-value pair: ${line}`);
       }
-      const key = Struct.parseKeyName(match[1].trim());
+      const key = match[1].trim();
       const value = match[3].trim();
-      if (parent[key] === undefined) {
-        parent[key] = value;
-      } else {
-        parent[`${key}_dupe_${index}`] = value;
-      }
+      Struct.addEntry(parent, key, value, index);
     };
     let index = 0;
 
@@ -158,13 +179,9 @@ export abstract class Struct {
           const newStruct = parseHead(line);
           if (current) {
             const key = Struct.renderStructName(newStruct.constructor.name);
-            if (current[key] !== undefined) {
-              current[`${key}_dupe_${index}`] = newStruct;
-            } else {
-              current[key] = newStruct;
-            }
+            Struct.addEntry(current, key, newStruct, index);
           } else {
-            newStruct["__proto__"].isRoot = true;
+            newStruct.isRoot = true;
             roots.push(newStruct);
           }
           stack.push(newStruct);

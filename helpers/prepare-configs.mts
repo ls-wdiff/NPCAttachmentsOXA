@@ -93,7 +93,7 @@ const res = getCfgFiles()
       file.slice(path.join(rootDir, dirPath).length + 1),
     );
 
-    const modFileRoot = path.join(rootDir, MOD_NAME, dirPath);
+    const modFileRoot = path.join(rootDir, "Mods", MOD_NAME, dirPath);
     const modFileDir = path.join(modFileRoot, pathToSave.dir, pathToSave.name);
     if (!fs.existsSync(modFileDir)) {
       fs.mkdirSync(modFileDir, { recursive: true });
