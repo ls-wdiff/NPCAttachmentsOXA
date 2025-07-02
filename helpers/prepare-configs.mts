@@ -83,7 +83,7 @@ function getCfgFiles() {
   });
   return cfgFiles;
 }
-const MOD_NAME = "GlassCannon";
+const MOD_NAME = "";
 const interestingFiles = [];
 const res = getCfgFiles()
   .filter((file) => interestingFiles.some((i) => file.includes(i)))
