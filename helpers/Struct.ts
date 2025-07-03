@@ -90,7 +90,7 @@ export abstract class Struct {
     }
     text += "\n";
     // Add all keys
-    text += Object.entries(this.entries)
+    text += Object.entries(this.entries || {})
       .filter(([key]) => key !== "_useAsterisk")
       .map(([key, value]) =>
         Struct.pad(
