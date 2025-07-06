@@ -17,7 +17,7 @@ const cmd = (name) => {
   ].join(" ");
 };
 
-childProcess.execSync(cmd("GlassCannon"), {
+childProcess.execSync(cmd("IncreaseZombieSpawn"), {
   stdio: "inherit",
   cwd: root,
   shell: "/usr/bin/bash",
