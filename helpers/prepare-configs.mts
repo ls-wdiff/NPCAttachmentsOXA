@@ -37,7 +37,7 @@ getCfgFiles()
     const pathToSave = path.parse(file.slice(path.join(rootDir, dirPath).length + 1));
 
     const modFileRoot = path.join(rootDir, "Mods", MOD_NAME, dirPath);
-    const modFileDir = path.join(modFileRoot, pathToSave.dir, pathToSave.name);
+    const modFileDir = path.join(modFileRoot, pathToSave.dir, pathToSave.name, "raw");
     if (!fs.existsSync(modFileDir)) {
       fs.mkdirSync(modFileDir, { recursive: true });
     }
