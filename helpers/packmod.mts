@@ -7,17 +7,10 @@ const stalkerModsPath =
 const cmd = (name) => {
   const fullName = path.join(root, name);
   const packName = `${fullName}.pak`;
-  return [
-    `/home/sdwvit/.cargo/bin/repak pack`,
-    fullName,
-    packName,
-    `&& mv`,
-    packName,
-    stalkerModsPath,
-  ].join(" ");
+  return [`/home/sdwvit/.cargo/bin/repak pack`, fullName, packName, `&& mv`, packName, stalkerModsPath].join(" ");
 };
 
-childProcess.execSync(cmd("IncreaseZombieSpawn"), {
+childProcess.execSync(cmd("LongLastingBuffs"), {
   stdio: "inherit",
   cwd: root,
   shell: "/usr/bin/bash",

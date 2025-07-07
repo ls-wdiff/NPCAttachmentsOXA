@@ -27,8 +27,8 @@ function getCfgFiles() {
   });
   return cfgFiles;
 }
-const MOD_NAME = "TradersDontSellWeaponsArmor";
-const interestingFiles = [];
+const MOD_NAME = "LongLastingBuffs";
+const interestingFiles = ["ConsumablePrototypes"];
 
 getCfgFiles()
   .filter((file) => interestingFiles.some((i) => file.includes(i)))
@@ -42,11 +42,19 @@ getCfgFiles()
       fs.mkdirSync(modFileDir, { recursive: true });
     }
     const structs = Struct.fromString<Struct & { entries: { SID?: string } }>(readOneFile(file))
-      .filter((s) => s.entries.SID)
+      .filter(
+        (s) =>
+          s.entries.SID &&
+          Object.entries(s.entries).filter(([key]) => key === "ShouldShowEffects" || key === "EffectsDisplayTypes")
+            .length,
+      )
       .map((s) => {
         s.refurl = "../" + pathToSave.base;
         s.refkey = s.entries.SID;
         s._id = `${MOD_NAME}${s._id ? `_${s._id}` : ""}`;
+        s.entries = Object.fromEntries(
+          Object.entries(s.entries).filter(([key]) => key === "ShouldShowEffects" || key === "EffectsDisplayTypes"),
+        );
         return s.toString();
       });
     fs.writeFileSync(path.join(modFileDir, `${MOD_NAME}${pathToSave.base}`), structs.join("\n\n"));

@@ -1,0 +1,10 @@
+"workshopitem"
+{
+	"appid"		"1643320"
+	"publishedfileid"		"3519497809"
+	"contentfolder"		"/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Mods/LongLastingBuffs/steamworkshop"
+	"previewfile"		"/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Mods/LongLastingBuffs/512.png"
+	"title"		"Long Lasting Buffs by sdwvit"
+	"description"		"This mode does only one thing: increases consumables positive effects length. For example, Energy drink used to give extra stamina regen for 45 seconds, now it lasts 7.5 minutes. Meant to be used in other collections of mods."
+	"changenote"		"Initial release"
+}
