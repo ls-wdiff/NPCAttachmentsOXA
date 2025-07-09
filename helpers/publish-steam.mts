@@ -43,10 +43,10 @@ const cmd = (name: string, title: string, description: string, changenote = "") 
 
 childProcess.execSync(
   cmd(
-    "GlassCannon",
-    "Glass Cannon by sdwvit",
-    `This mode does only one thing: increases weapons damage by a lot. Here’s the deal, kiddo - this mod makes you a glass cannon, so you’re basically one-shotting everything, at the same time you’ll get wrecked by every bullet, every mutant, every *thing* that’s not you. It’s brutal as hell… but *so* much more satisfying when you pull through. It’s not for the weak. If you’re struggling? Just switch to Normal mode for that one fight - no shame in that. This thing’s all about fun, not suffering. Maybe you’re a noob, but you’ve got this. Now go prove it. It is meant to be used in other collections of mods. Does not conflict with anything.`,
-    "Rename the mod, and update icon",
+    "CantBeKnockedDown",
+    "Can't Be Knocked Down by sdwvit",
+    `This mode does only one thing: it makes you unable to be knocked down by any NPCs, including bosses. It is meant to be used in other collections of mods. Does not conflict with anything.`,
+    "Initial release",
   ),
   {
     stdio: "inherit",
