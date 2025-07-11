@@ -31,7 +31,7 @@ function getCfgFiles() {
   return cfgFiles;
 }
 const MOD_NAME = process.env.MOD_NAME;
-const interestingFiles = [];
+const interestingFiles = ["QuestNodePrototypes/RSQ06_C00___SIDOROVICH"];
 const modFolder = path.join(rootDir, "Mods", MOD_NAME);
 const modFolderRaw = path.join(modFolder, "raw");
 const modFolderSteam = path.join(modFolder, "steamworkshop");
