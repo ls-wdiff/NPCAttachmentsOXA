@@ -43,9 +43,9 @@ const cmd = (name: string, title: string, description: string, changenote = "") 
 
 childProcess.execSync(
   cmd(
-    "NoFallDamage",
-    "No Fall Damage by sdwvit",
-    `This mode does only one thing: Eliminates all damage from falling at any height. It is meant to be used in other collections of mods. Does not conflict with anything.`,
+    "ReduceQuestCooldown",
+    "Reduce Quest Cooldown by sdwvit",
+    `This mode does only one thing: reduces cooldown between barkeep/vendor/mechanic quests to 4 in-game hours. --- Because Waiting Is for the Weak. --- It is meant to be used in other collections of mods. Does not conflict with anything.`,
     "Initial release",
   ),
   {
