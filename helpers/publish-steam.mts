@@ -48,8 +48,8 @@ childProcess.execSync(
   cmd(
     process.env.MOD_NAME,
     `${process.env.MOD_NAME.replace(/([A-Z])/g, " $1")} by sdwvit`,
-    `This mode does only one thing: removes all 650+ medkits placed around the map for more challenging gameplay. --- Tired of those cute little medkits scattered around the map like breadcrumbs for weaklings? This mod is for players who want to feel the sting of death without any pre-placed safety nets. Increased tension. Every bullet, tripwire, and mutant encounter feels like a 10/10 horror movie. Achievement unlocked: “I DIED 47 TIMES BEFORE MY FIRST SAVE.” --- It is meant to be used in other collections of mods. Does not conflict with anything.`,
-    "Update logo",
+    `This mode does only one thing: traders no longer sell you weapons or armor. --- 🪓 Welcome to the ultimate survival challenge for Stalker 2 purists! --- It is meant to be used in other collections of mods. Does not conflict with anything.`,
+    "Initial release",
   ),
   {
     stdio: "inherit",
