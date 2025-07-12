@@ -38,9 +38,25 @@ const modFolderSteam = path.join(modFolder, "steamworkshop");
 if (!fs.existsSync(modFolderSteam)) {
   fs.mkdirSync(modFolderSteam, { recursive: true });
 }
+const prohibitedIds = [
+  "Zombie_",
+  "GeneralNPC",
+  "DeadBody",
+  "Corpse",
+  "CloseCombat",
+  "Guard",
+  "Granit",
+  "Sniper",
+  "Bartender",
+  "_Attachments_",
+  "Ammo",
+  "Medic",
+  "Techician",
+  "Technician",
+];
+
 const total = getCfgFiles()
   .filter((file) => interestingFiles.some((i) => file.includes(i)))
-  .filter((file) => readOneFile(file).toLowerCase().includes("medkit"))
   .map((file) => {
     console.log(`Parsing ${file}`);
     const pathToSave = path.parse(file.slice(path.join(rootDir, baseCfgDir).length + 1));
@@ -55,7 +71,7 @@ const total = getCfgFiles()
         };
       }
     >(readOneFile(file))
-      .filter((s) => s.entries.SID)
+      .filter((s) => s.entries.SID && prohibitedIds.every((id) => !s.entries.SID.includes(id)))
       .map((s) => {
         s.refurl = "../" + pathToSave.base;
         s.refkey = s.entries.SID;
