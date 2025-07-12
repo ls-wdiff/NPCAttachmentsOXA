@@ -32,7 +32,7 @@ function getCfgFiles() {
   return cfgFiles;
 }
 const MOD_NAME = process.env.MOD_NAME;
-const interestingFiles = ["SpawnActorPrototypes/WorldMap_WP"];
+const interestingFiles = [];
 const modFolder = path.join(rootDir, "Mods", MOD_NAME);
 const modFolderRaw = path.join(modFolder, "raw");
 const modFolderSteam = path.join(modFolder, "steamworkshop");
