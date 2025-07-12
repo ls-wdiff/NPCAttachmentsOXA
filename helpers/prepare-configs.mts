@@ -46,30 +46,42 @@ const total = getCfgFiles()
     const pathToSave = path.parse(file.slice(path.join(rootDir, baseCfgDir).length + 1));
 
     const cfgEnclosingFolder = path.join(modFolderRaw, baseCfgDir, pathToSave.dir, pathToSave.name);
-    const interestingCategories = [
+    const interestingCategories = new Set([
       "EItemGenerationCategory::WeaponPistol",
       "EItemGenerationCategory::WeaponPrimary",
       "EItemGenerationCategory::WeaponSecondary",
       "EItemGenerationCategory::Head",
       "EItemGenerationCategory::BodyArmor",
-    ];
+    ]);
     const structs = Struct.fromString<
-      Struct & {
-        entries: {
-          SID?: string;
-          ItemGenerator: Struct;
-        };
-      }
+      Struct<{
+        SID: string;
+        ItemGenerator: Struct<
+          { Category?: string; ReputationThreshold?: number } & Record<
+            string,
+            Struct<{ Category?: string; ReputationThreshold?: number }>
+          >
+        >;
+      }>
     >(readOneFile(file))
-      .filter((s) => s.entries.SID && s.entries.ItemGenerator)
+      .filter((s) => s.entries.SID.includes("Trader_"))
       .map((s) => {
         s.refurl = "../" + pathToSave.base;
         s.refkey = s.entries.SID;
         s._id = `${MOD_NAME}${idIsArrayIndex(s._id) ? "" : `_${s._id}`}`;
-        if (interestingCategories.some((e) => s.toString().includes(e))) {
-          return s;
+        let keep = false;
+        const itemGenerator = s.entries.ItemGenerator;
+        if (interestingCategories.has(itemGenerator.entries.Category)) {
+          itemGenerator.entries.ReputationThreshold = 1000000;
+          keep = true;
         }
-        return null;
+        Object.values(itemGenerator.entries).filter((entry) => {
+          if (entry instanceof Struct && interestingCategories.has(entry.entries.Category)) {
+            entry.entries.ReputationThreshold = 1000000;
+            keep = true;
+          }
+        });
+        return keep ? s : null;
       })
       .filter((s) => s);
 
