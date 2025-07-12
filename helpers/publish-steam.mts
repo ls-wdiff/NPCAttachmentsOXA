@@ -47,9 +47,9 @@ const cmd = (name: string, title: string, description: string, changenote = "") 
 childProcess.execSync(
   cmd(
     process.env.MOD_NAME,
-    "No Quest Cooldown by sdwvit",
-    `This mode does only one thing: completely eliminates (well, brings it down to about 30 sec - engine limitation) cooldown between barkeep/vendor/mechanic quests. --- Because Waiting Is for the Weak. --- It is meant to be used in other collections of mods. Does not conflict with anything.`,
-    "Initial release",
+    `${process.env.MOD_NAME.replace(/([A-Z])/g, " $1")} by sdwvit`,
+    `This mode does only one thing: removes all 650+ medkits placed around the map for more challenging gameplay. --- Tired of those cute little medkits scattered around the map like breadcrumbs for weaklings? This mod is for players who want to feel the sting of death without any pre-placed safety nets. Increased tension. Every bullet, tripwire, and mutant encounter feels like a 10/10 horror movie. Achievement unlocked: “I DIED 47 TIMES BEFORE MY FIRST SAVE.” --- It is meant to be used in other collections of mods. Does not conflict with anything.`,
+    "Update logo",
   ),
   {
     stdio: "inherit",
