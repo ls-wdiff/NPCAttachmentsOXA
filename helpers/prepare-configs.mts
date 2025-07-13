@@ -5,7 +5,6 @@ import path from "node:path";
 import * as fs from "node:fs";
 
 import dotEnv from "dotenv";
-import { s } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 dotEnv.config();
 // scan all local .cfg files
@@ -32,13 +31,11 @@ function getCfgFiles() {
   return cfgFiles;
 }
 const MOD_NAME = process.env.MOD_NAME;
-const interestingFiles = ["DynamicItemGenerator.cfg"];
-const prohibitedIds = ["Trader"];
-const interstingIds = new Set([
-  "EItemGenerationCategory::BodyArmor",
-  "EItemGenerationCategory::Head",
-  "EItemGenerationCategory::Attach",
-]);
+const interestingFiles = ["TradePrototypes.cfg"];
+const prohibitedIds = [];
+const interstingIds = {
+  NPCType: "ENPCType::Trader",
+};
 
 const modFolder = path.join(rootDir, "Mods", MOD_NAME);
 const modFolderRaw = path.join(modFolder, "raw");
@@ -61,7 +58,7 @@ const total = getCfgFiles()
 
     const structs = Struct.fromString<
       Struct<{
-        ItemGenerator: Struct<{
+        ItemGenerator?: Struct<{
           [key: `[${number | string}]`]: Struct<{
             Category: string;
             PlayerRank: string;
@@ -79,15 +76,23 @@ const total = getCfgFiles()
           }>;
         }>;
         SpawnOnStart?: boolean;
+        NPCType?: string;
         SID?: string;
+        BuyCoefficient?: number;
+        SellCoefficient?: number;
       }>
     >(readOneFile(file))
-      .filter((s) => s.entries.SID && prohibitedIds.every((id) => !s.entries.SID.includes(id)))
+      .filter(
+        (s) =>
+          s.entries.SID &&
+          //s.entries.NPCType === interstingIds.NPCType &&
+          prohibitedIds.every((id) => !s.entries.SID.includes(id)),
+      )
       .map((s) => {
         s.refurl = "../" + pathToSave.base;
         s.refkey = s.entries.SID;
         s._id = `${MOD_NAME}${idIsArrayIndex(s._id) ? "" : `_${s._id}`}`;
-        let keep = false;
+        /* let keep = false;
         Object.values(s.entries.ItemGenerator.entries).forEach((item) => {
           if (interstingIds.has(item.entries?.Category)) {
             Object.values(item.entries.PossibleItems.entries).forEach((pos) => {
@@ -128,7 +133,10 @@ const total = getCfgFiles()
             if (item.entries) item.entries = {} as typeof item.entries; // remove non-interesting categories
           }
         });
-        return keep ? s : null;
+        return keep ? s : null;*/
+        //s.entries.SellCoefficient ||= 1;
+        //s.entries.SellCoefficient *= 10;
+        return s;
       })
       .filter((_) => _);
 
