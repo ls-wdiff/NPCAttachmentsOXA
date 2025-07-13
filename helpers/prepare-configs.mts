@@ -5,6 +5,7 @@ import path from "node:path";
 import * as fs from "node:fs";
 
 import dotEnv from "dotenv";
+import { s } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 dotEnv.config();
 // scan all local .cfg files
@@ -63,6 +64,7 @@ const total = getCfgFiles()
         ItemGenerator: Struct<{
           [key: `[${number | string}]`]: Struct<{
             Category: string;
+            PlayerRank: string;
             PossibleItems: Struct<{
               [key: `[${number | string}]`]: Struct<{
                 ItemPrototypeSID: string;
@@ -103,7 +105,7 @@ const total = getCfgFiles()
                   } as typeof pos.entries;
                   // newObj.Weight = pos.entries.Weight || 1;
                   if (item.entries?.Category !== "EItemGenerationCategory::Attach") {
-                    newObj.MinDurability = pos.entries.MinDurability || 0;
+                    newObj.MinDurability = pos.entries.MinDurability || 0.01;
                     newObj.MaxDurability =
                       pos.entries.MaxDurability ||
                       (Math.random() * 0.5 + parseFloat(newObj.MinDurability.toString())).toFixed(3);
@@ -112,8 +114,13 @@ const total = getCfgFiles()
                   newObj.Chance =
                     parseFloat(pos.entries.Chance?.toString()) ||
                     parseFloat((pos.entries.Weight || 1).toString()) / 1000;
-
+                  while (newObj.Chance >= 0.5) {
+                    newObj.Chance /= 10;
+                  }
                   pos.entries = newObj;
+                  delete item.entries.Category;
+                  delete item.entries.PlayerRank;
+                  delete s.entries.SID;
                 }
               }
             });
