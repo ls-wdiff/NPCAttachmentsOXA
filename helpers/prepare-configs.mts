@@ -31,7 +31,7 @@ function getCfgFiles() {
   return cfgFiles;
 }
 const MOD_NAME = process.env.MOD_NAME;
-const interestingFiles = ["TradePrototypes.cfg"];
+const interestingFiles = ["WorldMap_WP"];
 const prohibitedIds = [];
 const interstingIds = {
   NPCType: "ENPCType::Trader",
@@ -46,10 +46,10 @@ if (!fs.existsSync(modFolderSteam)) {
 
 const total = getCfgFiles()
   .filter((file) => interestingFiles.some((i) => file.includes(i)))
-  //.filter((file) => {
-  //  const oneFile = readOneFile(file);
-  //  return oneFile.includes("Medkit");
-  //})
+  .filter((file) => {
+    const oneFile = readOneFile(file);
+    return oneFile.includes("D_WoodenAmmoCrate_01");
+  })
   .map((file) => {
     console.log(`Parsing ${file}`);
     const pathToSave = path.parse(file.slice(path.join(rootDir, baseCfgDir).length + 1));
@@ -136,6 +136,9 @@ const total = getCfgFiles()
         return keep ? s : null;*/
         //s.entries.SellCoefficient ||= 1;
         //s.entries.SellCoefficient *= 10;
+        s.entries = {
+          SpawnOnStart: false,
+        };
         return s;
       })
       .filter((_) => _);

@@ -49,7 +49,7 @@ childProcess.execSync(
     process.env.MOD_NAME,
     `${process.env.MOD_NAME.replace(/([A-Z])/g, " $1")} by sdwvit`,
     ``,
-    "Removes redundant overrides",
+    "Fix issue with mod not loading in game",
   ),
   {
     stdio: "inherit",

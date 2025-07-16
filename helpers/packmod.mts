@@ -22,12 +22,12 @@ const cmd = (name) => {
     `/home/sdwvit/.cargo/bin/repak pack`,
     rawPath,
     packName,
-    `&& cp`,
+    `&& mv`,
     packName,
     stalkerModsPath,
-    "&& mv -f",
-    packName,
-    destinationFullPath,
+    // "&& mv -f",
+    // packName,
+    // destinationFullPath,
   ].join(" ");
 };
 
