@@ -30,8 +30,10 @@ export const meta = {
   interestingContents: ["ESpawnType::Item", ...items],
   prohibitedIds: [],
   interestingIds: [],
-  description: "",
-  changenote: "",
+  description:
+    "This mode does only one thing: removes all 436 weapons / armors placed around the Zone --- Full scavenger mode! Works best with NPCs drop armor (my other wip mod) --- It is meant to be used in other collections of mods. Does not conflict with anything.",
+  changenote:
+    "Game wants a few more properties on struct descriptor to be considered valid",
   entriesTransformer: (entries: StructType["entries"]) => {
     if (
       items.some((i) => entries.ItemSID?.includes(i)) &&
