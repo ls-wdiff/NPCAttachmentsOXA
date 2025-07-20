@@ -36,17 +36,16 @@ export const meta = {
   ],
   prohibitedIds: [],
   interestingIds: [],
-  description:
-    "This mode does only one thing: removes all 650+ medkits placed around the map for more challenging gameplay.\n" +
-    "---\n" +
-    "😤 Tired of those cute little medkits scattered around the map like breadcrumbs for weaklings?\n" +
-    "💀 This mod is for players who want to feel the sting of death without any pre-placed safety nets.\n" +
-    "🕸️ Increased tension. Every bullet, tripwire, and mutant encounter feels like a 10/10 horror movie.\n" +
-    "⚰️ Achievement unlocked: “I DIED 47 TIMES BEFORE REACHING ZALISSYA.”\n" +
-    "---\n" +
-    "It is meant to be used in other collections of mods. Does not conflict with anything.\n" +
-    "---\n" +
-    "Thanks @rbwadle for suggesting how to modify map objects.",
+  description: `This mode does only one thing: removes all 650+ medkits placed around the map for more challenging gameplay.
+---
+😤 Tired of those cute little medkits scattered around the map like breadcrumbs for weaklings?
+💀 This mod is for players who want to feel the sting of death without any pre-placed safety nets.
+🕸️ Increased tension. Every bullet, tripwire, and mutant encounter feels like a 10/10 horror movie.
+⚰️ Achievement unlocked: “I DIED 47 TIMES BEFORE REACHING ZALISSYA.”
+---
+It is meant to be used in other collections of mods. Does not conflict with anything.
+---
+Thanks @rbwadle for suggesting how to modify map objects.`,
   changenote:
     "Game wants a few more properties on struct descriptor to be considered valid",
   entriesTransformer: (entries: StructType["entries"]) => {

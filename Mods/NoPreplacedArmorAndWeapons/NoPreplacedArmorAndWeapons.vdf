@@ -6,5 +6,5 @@
 	"previewfile"		"/home/sdwvit/MX500-900/games/stalker-modding/Output/Exports/Mods/NoPreplacedArmorAndWeapons/512.png"
 	"title"		"No Preplaced Armor And Weapons by sdwvit"
 	"description"		"This mode does only one thing: removes all 1592 weapons / armour placed around the Zone --- HOBO phase is back! --- It is meant to be used in other collections of mods. Does not conflict with anything."
-	"changenote"		"Fix issue with mod not loading in game"
+	"changenote"		"Initial release"
 }

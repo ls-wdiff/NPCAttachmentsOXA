@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import * as VDF from "@node-steam/vdf";
 
 import dotEnv from "dotenv";
-
+await import("./pull-staged.mjs");
 dotEnv.config();
 const MODS_PATH = path.join(import.meta.dirname, "../Mods");
 const STALKER_STEAM_ID = "1643320";
@@ -34,8 +34,8 @@ const cmd = (name: string) => {
   if (fs.existsSync(metaPath)) {
     const metaContent = fs.readFileSync(metaPath, "utf8");
     const metaData = JSON.parse(metaContent);
-    description ||= metaData.description;
-    changenote ||= metaData.changenote;
+    description = metaData.description;
+    changenote = metaData.changenote;
   }
 
   if (fs.existsSync(vdfFilePath)) {
