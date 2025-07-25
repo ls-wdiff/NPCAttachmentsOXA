@@ -17,10 +17,10 @@ export const meta = {
   interestingIds: [],
   description:
     "This mode does only one thing: reduces cooldown between barkeep/vendor/mechanic quests to 3 in-game hours. --- Because Waiting Is for the Weak. --- It is meant to be used in other collections of mods. Modifies quest vendor cfg files.",
-  changenote: "Update to 1.5.2",
+  changenote: "Update to 1.5.2-v2",
   entriesTransformer: (entries: Entries) => {
     if (entries.InGameHours) {
-      return { InGameHours: 3 };
+      return { ...entries, InGameHours: 3 };
     }
     return null;
   },
