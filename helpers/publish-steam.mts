@@ -21,7 +21,7 @@ const cmd = (name: string) => {
   vdfData.workshopitem.publishedfileid ||= "0"; // This will be set by SteamCMD
   vdfData.workshopitem.contentfolder = path.join(MODS_PATH, name, "steamworkshop");
   vdfData.workshopitem.previewfile = path.join(MODS_PATH, name, "512.png");
-  vdfData.workshopitem.title = sanitize(`${name.replace(/([A-Z])/g, "$1")} by sdwvit`);
+  vdfData.workshopitem.title = sanitize(`${name.replace(/([A-Z])/g, " $1").trim()} by sdwvit`);
   vdfData.workshopitem.description = sanitize(meta.description);
   vdfData.workshopitem.changenote = sanitize(meta.changenote);
 
