@@ -30,6 +30,7 @@ type EEmotionalFaceMasks = "EEmotionalFaceMasks::None";
 type EDialogAnimationType =
   | "EDialogAnimationType::NPCIdleWaitingStomachHands"
   | "EDialogAnimationType::NPCDisapprovalDoubtStiff";
+type EChangeValueMode = "EChangeValueMode::Set" | "EChangeValueMode::Add";
 
 type StructType = GetStructType<{
   SID: string;
@@ -75,7 +76,7 @@ type StructType = GetStructType<{
     ConditionType: EQuestConditionType;
     ConditionComparance: EConditionComparance;
     GlobalVariablePrototypeSID: string;
-    ChangeValueMode: "EChangeValueMode::Set" | "EChangeValueMode::Add";
+    ChangeValueMode: EChangeValueMode;
     VariableValue: number;
     JournalQuestSID?: string;
     LinkedNodePrototypeSID?: string;
@@ -90,37 +91,44 @@ type StructType = GetStructType<{
   ContaineredQuestPrototypeSID?: string;
   GlobalVariablePrototypeSID?: string;
   VariableValue?: string;
-  ChangeValueMode?: "EChangeValueMode::Set" | "EChangeValueMode::Add";
+  ChangeValueMode?: EChangeValueMode;
 }>;
 
 export const meta: Meta<StructType> = {
   changenote: "",
   description: "",
   entriesTransformer: (entries: StructType["entries"], context) => {
-    if (0) {
-      if (context.file.includes("RSQ06_C00___SIDOROVICH.cfg")) {
-        if (entries.InGameHours) {
-          entries.InGameHours = 0;
-        } else if (entries.SID === "RSQ06_C00___SIDOROVICH_If") {
-          const interest = entries.Conditions.entries["0"].entries["0"].entries;
-          interest.ConditionComparance = "EConditionComparance::Greater";
-          interest.VariableValue = 5;
-        } else if (entries.SID === "RSQ06_C00___SIDOROVICH_If_LessThen3Tasks") {
-          const interest = entries.Conditions.entries["0"].entries["0"].entries;
-          interest.ConditionComparance = "EConditionComparance::Less";
-          interest.VariableValue = 5;
-        } else {
-          return null;
-        }
+    if (context.file.includes("RSQ06_C00___SIDOROVICH.cfg")) {
+      if (entries.InGameHours) {
+        entries.InGameHours = 0;
       }
-      if (context.file.includes("RSQ06_Dialog_Sidorovich_RSQ.cfg")) {
-        if (entries.SID === "RSQ06_Dialog_Sidorovich_RSQ_If_1") {
-          const interest = entries.NextDialogOptions.entries.True.entries.Conditions.entries["0"].entries["0"].entries;
-          interest.ConditionComparance = "EConditionComparance::Less";
-          interest.VariableValue = 5;
-        } else {
-          return null;
-        }
+      /*if (entries.SID === "RSQ06_C00___SIDOROVICH_If") {
+        const interest = entries.Conditions.entries["0"].entries["0"].entries;
+        interest.ConditionComparance = "EConditionComparance::Greater";
+        interest.VariableValue = 5;
+      } else if (entries.SID === "RSQ06_C00___SIDOROVICH_If_LessThen3Tasks") {
+        const interest = entries.Conditions.entries["0"].entries["0"].entries;
+        interest.ConditionComparance = "EConditionComparance::Less";
+        interest.VariableValue = 5;
+      }*/
+    }
+    if (context.file.includes("RSQ06_Dialog_Sidorovich_RSQ.cfg")) {
+      /* if (entries.SID === "RSQ06_Dialog_Sidorovich_RSQ_If_1") {
+        const interest = entries.NextDialogOptions.entries.True.entries.Conditions.entries["0"].entries["0"].entries;
+        interest.ConditionComparance = "EConditionComparance::Less";
+        interest.VariableValue = 5;
+      }*/
+
+      const entriesT = entries as unknown as DialogStructType["entries"];
+      if (entriesT.VisibleOnFailedCondition !== undefined) {
+        entriesT.VisibleOnFailedCondition = true;
+      }
+      if (entriesT.NextDialogOptions) {
+        Object.values(entriesT.NextDialogOptions.entries)
+          .filter((e) => e.entries)
+          .forEach((nextDialogOption) => {
+            nextDialogOption.entries.VisibleOnFailedCondition = true;
+          });
       }
     }
     return entries;
@@ -159,16 +167,29 @@ type DialogStructType = GetStructType<{
   }[];
   AKEventName?: string;
   AKEventSubPath?: string;
-  NextDialogOptions: {
-    NextDialogSID: string;
-    Terminate?: boolean;
-    AvailableFromStart?: boolean;
-    VisibleOnFailedCondition?: boolean;
-    MainReply?: boolean;
-    AnswerTo?: number;
-    IncludeBy?: "";
-    ExcludeBy?: "";
-  }[];
+  NextDialogOptions: Record<
+    number | "True" | "False",
+    {
+      NextDialogSID: string;
+      Terminate?: boolean;
+      AvailableFromStart?: boolean;
+      VisibleOnFailedCondition?: boolean;
+      MainReply?: boolean;
+      AnswerTo?: number;
+      IncludeBy?: "";
+      ExcludeBy?: "";
+      Conditions?: {
+        ConditionType: EQuestConditionType;
+        ConditionComparance: EConditionComparance;
+        LinkedNodePrototypeSID?: string;
+        GlobalVariablePrototypeSID?: string;
+        CompletedNodeLauncherNames?: ""[];
+
+        ChangeValueMode?: EChangeValueMode;
+        VariableValue?: number;
+      }[][];
+    }
+  >;
   HasVOInSequence?: boolean;
   DialogActions?: "" | { DialogAction: EDialogAction }[];
   DialogAnswerActions?: {
@@ -192,10 +213,11 @@ type DialogStructType = GetStructType<{
   BlendExpForEaseInOut?: number;
   SpeechDuration?: number;
   ShowNextDialogOptionsAsAnswers?: boolean;
+  VisibleOnFailedCondition?: boolean;
 }>;
 
 function processRSQ06_Dialog_Sidorovich_RSQ(structs: DialogStructType[]) {
-  const bySID = structs.reduce(
+  const tree = structs.reduce(
     (mem, s) => {
       mem[s.entries.SID] ||= s;
       s["children"] ||= [];
@@ -203,6 +225,75 @@ function processRSQ06_Dialog_Sidorovich_RSQ(structs: DialogStructType[]) {
     },
     {} as Record<string, DialogStructType>,
   );
+
+  const renderOne = (v: DialogStructType) => {
+    let res = "";
+
+    if (v.entries.DialogActions) {
+      Object.values(v.entries.DialogActions.entries)
+        .filter((e) => e.entries)
+        .forEach((e) => {
+          if (e.entries.DialogAction === "EDialogAction::SideQuest") {
+            res += `runQuest();`;
+          } else if (e.entries.DialogAction === "EDialogAction::ShowMoney") {
+            res += `showMoney();`;
+          }
+        });
+    }
+
+    Object.values(v.entries.NextDialogOptions.entries)
+      .filter((nextDialogOption) => nextDialogOption.entries)
+      .forEach((nextDialogOption) => {
+        if (nextDialogOption.entries.Conditions) {
+          res += `if (${getCondition(nextDialogOption)}) {`;
+        }
+        if (nextDialogOption.entries.Terminate) {
+          res ||= 'const output = "";';
+          res += `if (output === ${nextDialogOption.entries.NextDialogSID || "noop"}()) {\nreturn exit();}`;
+        } else {
+          res += `${nextDialogOption.entries.NextDialogSID || "noop"}();`;
+        }
+        if (nextDialogOption.entries.Conditions) {
+          res += "}";
+        }
+      });
+    return res;
+  };
+  const context = `
+        const runQuest = (id) => {
+          console.log('Launching quest "'  + id + '"');
+          return id;
+        }
+        const showMoney = () => {
+          console.log('Showing money');
+        }
+        const noop = () => {};
+        const exit = () => {
+          console.log('Exiting dialog');
+          return "";
+        }
+        const outputOf = (id) => {
+          console.log('Getting output of "'  + id + '"');
+          return id;
+        }
+        const RSQ06_SidorovichQuest = 0;
+        const RSQ06_C00___SIDOROVICH_Add_C01 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C02 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C03 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C04 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C05 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C06 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C07 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C08 = '';
+        const RSQ06_C00___SIDOROVICH_Add_C09 = '';
+        const RSQ06_C00___SIDOROVICH_Technical_GetQuest = noop;
+  `;
+  const syntax =
+    context +
+    Object.values(tree)
+      .map((v) => `const ${v.entries.SID}=()=>{${renderOne(v)}};`)
+      .join("\n");
+  fs.writeFileSync("/home/sdwvit/.config/JetBrains/IntelliJIdea2025.1/scratches/2.js", syntax);
 }
 
 function processRSQ06(structs: StructType[]) {
@@ -282,42 +373,7 @@ function processRSQ06(structs: StructType[]) {
         const RSQ06_Dialog_Sidorovich_DeclineJob_RSQ06_Dialog_Sidorovich_RSQ_cancel_job_confirm_41270 = '';
         const RSQ06_C09___S_P_SetJournal_RSQ06 = '';
       `;
-  const getComparator = (e: StructType["entries"]["Conditions"]["entries"][number]["entries"][number]) => {
-    const options = {
-      "EConditionComparance::Greater": ">",
-      "EConditionComparance::Less": "<",
-      "EConditionComparance::NotEqual": "!==",
-      "EConditionComparance::Equal": "===",
-    };
-    return options[e.entries.ConditionComparance];
-  };
-  const getAssignment = (v: Struct<{ ChangeValueMode: "EChangeValueMode::Set" | "EChangeValueMode::Add" }>) => {
-    return { "EChangeValueMode::Add": "+=", "EChangeValueMode::Set": "=" }[v.entries.ChangeValueMode];
-  };
-  const getCondition = (v: StructType) => {
-    return Object.values(v.entries.Conditions.entries)
-      .filter((e) => e.entries)
-      .map((e) => Object.values(e.entries))
-      .flat()
-      .filter((e) => e._id)
-      .map((e) => {
-        switch (e.entries?.ConditionType) {
-          case "EQuestConditionType::JournalState":
-            return `${e.entries.JournalQuestSID}${getComparator(e)}${JSON.stringify(e.entries.JournalState)}`;
-          case "EQuestConditionType::GlobalVariable":
-            return `${e.entries.GlobalVariablePrototypeSID}${getComparator(e)}${e.entries.VariableValue}`;
-          case "EQuestConditionType::Bridge":
-            if (e.entries.LinkedNodePrototypeSID === v.entries.SID) {
-              return `${v.entries.SID}.lastRunOutput${getComparator(e)}${e.entries.CompletedNodeLauncherNames.entries["0"] === "None" ? "Some" : "undefined"}`;
-            }
-            return `outputOf(${e.entries.LinkedNodePrototypeSID})${getComparator(e)}${e.entries.CompletedNodeLauncherNames.entries["0"] || '""'}`;
-          default:
-            console.warn(`This shouldn't happen: ConditionType = '${e.entries?.ConditionType}'`);
-        }
-      })
-      .filter(Boolean)
-      .join("&&");
-  };
+
   const renderOneBody = (v: StructType) => {
     let res = "";
     switch (v.entries.NodeType) {
@@ -405,4 +461,57 @@ function processRSQ06(structs: StructType[]) {
     "/home/sdwvit/.config/JetBrains/IntelliJIdea2025.1/scratches/1.js",
     syntax.replaceAll(/(\W)fdsfsdf/g, "$1"),
   );
+}
+
+function getComparator(e: GetStructType<{ ConditionComparance: EConditionComparance }>) {
+  const options = {
+    "EConditionComparance::Greater": ">",
+    "EConditionComparance::Less": "<",
+    "EConditionComparance::NotEqual": "!==",
+    "EConditionComparance::Equal": "===",
+  };
+  return options[e.entries.ConditionComparance];
+}
+
+function getAssignment(v: Struct<{ ChangeValueMode: "EChangeValueMode::Set" | "EChangeValueMode::Add" }>) {
+  return { "EChangeValueMode::Add": "+=", "EChangeValueMode::Set": "=" }[v.entries.ChangeValueMode];
+}
+
+function getCondition(
+  v: GetStructType<{
+    Conditions: {
+      ConditionType: EQuestConditionType;
+      ConditionComparance: EConditionComparance;
+      GlobalVariablePrototypeSID?: string;
+      ChangeValueMode?: EChangeValueMode;
+      VariableValue?: number;
+      JournalQuestSID?: string;
+      LinkedNodePrototypeSID?: string;
+      JournalState?: string;
+      CompletedNodeLauncherNames: string[];
+    }[][];
+  }>,
+) {
+  return Object.values(v.entries.Conditions.entries)
+    .filter((e) => e.entries)
+    .map((e) => Object.values(e.entries))
+    .flat()
+    .filter((e) => e._id)
+    .map((e) => {
+      switch (e.entries?.ConditionType) {
+        case "EQuestConditionType::JournalState":
+          return `${e.entries.JournalQuestSID}${getComparator(e)}${JSON.stringify(e.entries.JournalState)}`;
+        case "EQuestConditionType::GlobalVariable":
+          return `${e.entries.GlobalVariablePrototypeSID}${getComparator(e)}${e.entries.VariableValue}`;
+        case "EQuestConditionType::Bridge":
+          if (e.entries.LinkedNodePrototypeSID === v.entries["SID"]) {
+            return `${v.entries["SID"]}.lastRunOutput${getComparator(e)}${e.entries.CompletedNodeLauncherNames.entries["0"] === "None" ? "Some" : "undefined"}`;
+          }
+          return `outputOf(${e.entries.LinkedNodePrototypeSID})${getComparator(e)}${e.entries.CompletedNodeLauncherNames.entries["0"] || '""'}`;
+        default:
+          console.warn(`This shouldn't happen: ConditionType = '${e.entries?.ConditionType}'`);
+      }
+    })
+    .filter(Boolean)
+    .join("&&");
 }
