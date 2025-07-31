@@ -9,29 +9,29 @@ dotEnv.config();
 // scan all local .cfg files
 const rootDir = path.join(import.meta.dirname, "..");
 const baseCfgDir = path.join("Stalker2", "Content", "GameLite");
-export type Meta = {
+export type Meta<T extends Struct<{ SID: string }>> = {
   changenote: string;
   description: string;
-  entriesTransformer(
-    entries: { SID: string },
-    context: { s: Struct<typeof entries>; i: number; arr: Struct[]; file: string },
-  ): Entries | null;
+  entriesTransformer(entries: T["entries"], context: { s: T; i: number; arr: Struct[]; file: string }): Entries | null;
   interestingContents: string[];
   interestingFiles: string[];
   interestingIds: string[];
   prohibitedIds: string[];
+  onFinish?: (structs: T[], p: { file: string }) => void;
 };
+
 const emptyMeta = `
-  import { Struct, Entries } from "s2cfgtojson";
-  type StructType = Struct<{}>;
-  export const meta = {
+  import { Struct } from "s2cfgtojson";
+  import { Meta } from "../../helpers/prepare-configs.mjs";
+  type EntriesType = { SID: string };
+  export const meta: Meta<Struct<EntriesType>> = {
     interestingFiles: [],
     interestingContents: [],
     prohibitedIds: [],
     interestingIds: [],
     description: "",
     changenote: "",
-    entriesTransformer: (entries: Entries) => entries,
+    entriesTransformer: (entries: EntriesType) => entries,
   };
 `.trim();
 
@@ -66,7 +66,7 @@ if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: tr
 const metaPath = path.join(modFolder, "meta.mts");
 if (!fs.existsSync(metaPath)) fs.writeFileSync(metaPath, emptyMeta);
 
-const { meta } = (await import(metaPath)) as { meta: Meta };
+const { meta } = (await import(metaPath)) as { meta: Meta<Struct<{ SID: string }>> };
 const { interestingIds, interestingFiles, interestingContents, prohibitedIds, entriesTransformer } = meta;
 
 const total = getCfgFiles()
@@ -105,6 +105,9 @@ const total = getCfgFiles()
         path.join(cfgEnclosingFolder, `${MOD_NAME}${pathToSave.base}`),
         structs.map((s) => s.toString()).join("\n\n"),
       );
+    }
+    if (meta.onFinish) {
+      meta.onFinish(structs, { file });
     }
     return structs;
   });

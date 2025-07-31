@@ -6,7 +6,7 @@ import * as fs from "node:fs";
 
 dotEnv.config();
 const MODS_PATH = path.join(import.meta.dirname, "../Mods");
-const SDK_PATH = "/media/nvme2/STALKER2ZoneKit";
+const SDK_PATH = process.env.SDK_PATH;
 const STAGED_PATH = path.join(SDK_PATH, "Stalker2", "SavedMods", "Staged");
 
 const cmd = (name: string) => {
