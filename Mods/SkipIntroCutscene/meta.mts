@@ -4,8 +4,8 @@ type EntriesType = { SID: string; Launchers: GetStructType<{}> };
 export const meta: Meta<Struct<EntriesType>> = {
   interestingFiles: ["E01_MQ01.cfg"],
   interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+  idBlockList: [],
+  idAllowList: [],
   description: "",
   changenote: "",
   entriesTransformer: (entries: EntriesType) => {

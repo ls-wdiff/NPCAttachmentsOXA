@@ -31,42 +31,24 @@ type StructType = GetStructType<{
   TileOffsetIndex: 58;
 }>;
 
-const items = [
-  "D_WoodenBox_01",
-  "D_WoodenBox_02",
-  "D_WoodenBox_03",
-  "D_WoodenBox_04",
-  "D_MetallCrate_01",
-  "D_WoodenAmmoCrate_01",
-  "D_WoodenDSPCrate_01",
-  "D_WoodenDSPCrate_02",
-  "D_WoodenDSPCrate_03",
-];
+const items = ["D_WoodenBox_01", "D_WoodenBox_02", "D_WoodenBox_03", "D_WoodenBox_04", "D_MetallCrate_01", "D_WoodenAmmoCrate_01", "D_WoodenDSPCrate_01", "D_WoodenDSPCrate_02", "D_WoodenDSPCrate_03"];
 const spawnTypes = ["ESpawnType::DestructibleObject"];
 
 export const meta: Meta = {
   interestingFiles: ["WorldMap_WP"],
   interestingContents: [...items],
-  prohibitedIds: [],
-  interestingIds: [],
+  idBlockList: [],
+  idAllowList: [],
   description: "",
   changenote: "",
   entriesTransformer(entries, context) {
     const entriesT = entries as StructType["entries"];
-    if (
-      (!items.length ||
-        items.some((i) => entriesT.SpawnedPrototypeSID?.includes(i))) &&
-      (!spawnTypes.length ||
-        spawnTypes.some((s) => entriesT.SpawnType === s)) &&
-      entriesT.ItemGeneratorSettings
-    ) {
+    if ((!items.length || items.some((i) => entriesT.SpawnedPrototypeSID?.includes(i))) && (!spawnTypes.length || spawnTypes.some((s) => entriesT.SpawnType === s)) && entriesT.ItemGeneratorSettings) {
       let keep = null;
       Object.values(entriesT.ItemGeneratorSettings.entries).forEach((e) => {
         Object.values(e.entries?.ItemGenerators.entries || {}).forEach((ie) => {
           if (ie.entries?.PrototypeSID) {
-            console.info(
-              `Found preplaced item generator: ${entriesT.SpawnedPrototypeSID}. Emptying it.`,
-            );
+            console.info(`Found preplaced item generator: ${entriesT.SpawnedPrototypeSID}. Emptying it.`);
             ie.entries.PrototypeSID = "Milk";
           }
         });

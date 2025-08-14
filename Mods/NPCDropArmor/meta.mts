@@ -113,8 +113,8 @@ const mapUnknownArmors = {
 export const meta: Meta = {
   interestingFiles: ["DynamicItemGenerator.cfg"],
   interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+  idBlockList: [],
+  idAllowList: [],
   description: "",
   changenote: "",
   entriesTransformer: (entries: StructType["entries"], c) => {
@@ -132,8 +132,7 @@ export const meta: Meta = {
                 pi.entries.Chance = 500 / allArmorCosts[pi.entries.ItemPrototypeSID];
               } else {
                 console.warn(`Unknown armor cost for ${pi.entries.ItemPrototypeSID}, using fallback values.`);
-                pi.entries.MaxDurability =
-                  pi.entries.MinDurability + 5000 / allArmorCosts[mapUnknownArmors[pi.entries.ItemPrototypeSID]];
+                pi.entries.MaxDurability = pi.entries.MinDurability + 5000 / allArmorCosts[mapUnknownArmors[pi.entries.ItemPrototypeSID]];
                 pi.entries.Chance = 500 / allArmorCosts[mapUnknownArmors[pi.entries.ItemPrototypeSID]];
                 pi.entries.ItemPrototypeSID ||= mapUnknownArmors[pi.entries.ItemPrototypeSID];
               }

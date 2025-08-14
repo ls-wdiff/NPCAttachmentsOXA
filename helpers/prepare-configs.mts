@@ -12,11 +12,11 @@ const baseCfgDir = path.join("Stalker2", "Content", "GameLite");
 export type Meta<T extends Struct<{ SID: string }>> = {
   changenote: string;
   description: string;
-  entriesTransformer(entries: T["entries"], context: { s: T; i: number; arr: Struct[]; file: string }): Entries | null;
+  entriesTransformer(entries: T["entries"], context: { s: T; i: number; arr: T[]; structsById: Record<string, T>; file: string }): Entries | null;
   interestingContents: string[];
   interestingFiles: string[];
-  interestingIds: string[];
-  prohibitedIds: string[];
+  idAllowList: string[];
+  idBlockList: string[];
   onFinish?: (structs: T[], p: { file: string }) => void;
 };
 
@@ -66,9 +66,11 @@ if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: tr
 const metaPath = path.join(modFolder, "meta.mts");
 if (!fs.existsSync(metaPath)) fs.writeFileSync(metaPath, emptyMeta);
 
-const { meta } = (await import(metaPath)) as { meta: Meta<Struct<{ SID: string }>> };
-const { interestingIds, interestingFiles, interestingContents, prohibitedIds, entriesTransformer } = meta;
+const { meta } = (await import(metaPath)) as { meta: Meta<WithSID> };
+const { idAllowList, interestingFiles, interestingContents, idBlockList, entriesTransformer } = meta;
 
+const interestingIdsSet = new Set(idAllowList);
+const prohibitedIdsSet = new Set(idBlockList);
 const total = getCfgFiles()
   .filter((file) => interestingFiles.some((i) => file.includes(i)))
   .map((file) => {
@@ -79,19 +81,21 @@ const total = getCfgFiles()
     // console.log(`Reading file: ${file}`);
     const pathToSave = path.parse(file.slice(path.join(rootDir, baseCfgDir).length + 1));
     const cfgEnclosingFolder = path.join(modFolderRaw, baseCfgDir, pathToSave.dir, pathToSave.name);
-
-    const structs = Struct.fromString<Struct<{ SID?: string }>>(content)
-      .filter(
-        (s): s is Struct<{ SID: string }> =>
-          s.entries.SID &&
-          (interestingIds.length ? interestingIds.some((id) => s.entries.SID.includes(id)) : true) &&
-          prohibitedIds.every((id) => !s.entries.SID.includes(id)),
-      )
+    const structsById: Record<string, WithSID> = Struct.fromString<WithSID>(content).reduce((acc, s) => {
+      if (s.entries.SID) {
+        acc[s.entries.SID] = s;
+      }
+      return acc;
+    }, {});
+    const structs = Object.values(structsById)
+      .filter((s): s is WithSID => (s.entries.SID && (idAllowList.length ? interestingIdsSet.has(s.entries.SID) : true) && idBlockList.length ? !prohibitedIdsSet.has(s.entries.SID) : true))
+      .map((s) => Struct.fromString<WithSID>(s.toString())[0])
       .map((s, i, arr) => {
         s.refurl = "../" + pathToSave.base;
+        s._refkey = s.refkey;
         s.refkey = s.entries.SID;
         s._id = `${MOD_NAME}${idIsArrayIndex(s._id) ? "" : `_${s._id}`}`;
-        if (entriesTransformer) (s as Struct).entries = entriesTransformer(s.entries, { s, i, arr, file });
+        if (entriesTransformer) (s as Struct).entries = entriesTransformer(s.entries, { s, i, arr, file, structsById });
         if (!s.entries) {
           return null;
         }
@@ -101,10 +105,7 @@ const total = getCfgFiles()
 
     if (structs.length) {
       if (!fs.existsSync(cfgEnclosingFolder)) fs.mkdirSync(cfgEnclosingFolder, { recursive: true });
-      fs.writeFileSync(
-        path.join(cfgEnclosingFolder, `${MOD_NAME}${pathToSave.base}`),
-        structs.map((s) => s.toString()).join("\n\n"),
-      );
+      fs.writeFileSync(path.join(cfgEnclosingFolder, `${MOD_NAME}${pathToSave.base}`), structs.map((s) => s.toString()).join("\n\n"));
     }
     if (meta.onFinish) {
       meta.onFinish(structs, { file });
@@ -122,3 +123,5 @@ await import("./push-to-sdk.mts");
 function idIsArrayIndex(id: string): boolean {
   return id && Struct.isNumber(Struct.extractKeyFromBrackets(id));
 }
+
+export type WithSID = Struct<{ SID: string }> & { _refkey?: Struct["refkey"] };

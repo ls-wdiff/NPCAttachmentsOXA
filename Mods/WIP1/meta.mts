@@ -1,14 +1,4 @@
-import {
-  EChangeValueMode,
-  EConditionComparance,
-  EDialogAction,
-  EDialogAnimationType,
-  EEmotionalFaceMasks,
-  EQuestConditionType,
-  EQuestNodeType,
-  GetStructType,
-  Struct,
-} from "s2cfgtojson";
+import { EChangeValueMode, EConditionComparance, EDialogAction, EDialogAnimationType, EEmotionalFaceMasks, EQuestConditionType, EQuestNodeType, GetStructType, Struct } from "s2cfgtojson";
 import { Meta } from "../../helpers/prepare-configs.mjs";
 import * as fs from "node:fs";
 
@@ -122,11 +112,8 @@ export const meta: Meta<StructType> = {
     return entries;
   },
   interestingContents: [],
-  interestingFiles: [
-    "QuestNodePrototypes/RSQ06_C00___SIDOROVICH.cfg",
-    "DialogPrototypes/RSQ06_Dialog_Sidorovich_RSQ.cfg",
-  ],
-  interestingIds: [],
+  interestingFiles: ["QuestNodePrototypes/RSQ06_C00___SIDOROVICH.cfg", "DialogPrototypes/RSQ06_Dialog_Sidorovich_RSQ.cfg"],
+  idAllowList: [],
   onFinish(structs: StructType[], { file }) {
     if (file.includes("QuestNodePrototypes/RSQ06_C00___SIDOROVICH.cfg")) {
       processRSQ06(structs);
@@ -135,7 +122,7 @@ export const meta: Meta<StructType> = {
       processRSQ06_Dialog_Sidorovich_RSQ(structs as unknown as DialogStructType[]);
     }
   },
-  prohibitedIds: [],
+  idBlockList: [],
 };
 
 type DialogStructType = GetStructType<{
@@ -445,10 +432,7 @@ function processRSQ06(structs: StructType[]) {
     Object.values(tree)
       .map((v) => `const ${v.entries.SID}=()=>{${renderOne(v)}};`)
       .join("\n");
-  fs.writeFileSync(
-    "/home/sdwvit/.config/JetBrains/IntelliJIdea2025.1/scratches/1.js",
-    syntax.replaceAll(/(\W)fdsfsdf/g, "$1"),
-  );
+  fs.writeFileSync("/home/sdwvit/.config/JetBrains/IntelliJIdea2025.1/scratches/1.js", syntax.replaceAll(/(\W)fdsfsdf/g, "$1"));
 }
 
 function getComparator(e: GetStructType<{ ConditionComparance: EConditionComparance }>) {
