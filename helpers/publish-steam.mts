@@ -8,7 +8,11 @@ await import("./pull-staged.mjs");
 dotEnv.config();
 const MODS_PATH = path.join(import.meta.dirname, "../Mods");
 const STALKER_STEAM_ID = "1643320";
-const sanitize = (str) => str.replace(/\n/g, "\\n").replace(/"/g, '\\"');
+const sanitize = (str: string) =>
+  str
+    .split("\n")
+    .map((l) => l.trim())
+    .join("[h2][/h2]");
 const modFolder = path.join(MODS_PATH, process.env.MOD_NAME);
 const metaPath = path.join(modFolder, "meta.mts");
 const { meta } = await import(metaPath);
@@ -27,15 +31,7 @@ const cmd = (name: string) => {
 
   fs.writeFileSync(vdfFilePath, VDF.stringify(vdfData), "utf8");
 
-  return [
-    process.env.STEAMCMD_PATH,
-    "+login",
-    `"${process.env.STEAM_USER}"`,
-    `"${process.env.STEAM_PASS}"`,
-    "+workshop_build_item",
-    `"${vdfFilePath}"`,
-    "+quit",
-  ].join(" ");
+  return [process.env.STEAMCMD_PATH, "+login", `"${process.env.STEAM_USER}"`, `"${process.env.STEAM_PASS}"`, "+workshop_build_item", `"${vdfFilePath}"`, "+quit"].join(" ");
 };
 
 childProcess.execSync(cmd(process.env.MOD_NAME), {

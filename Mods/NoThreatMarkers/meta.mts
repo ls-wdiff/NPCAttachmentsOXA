@@ -6,8 +6,12 @@ export const meta: Meta<Struct<EntriesType>> = {
   interestingContents: [],
   idBlockList: [],
   idAllowList: [],
-  description:
-    "This mod does only one thing: it removes threat indicators. Meaning you can no longer see any markers or red compass shadow indicating the presence of enemies or their direction. --- Let's make the game scary again. --- It is meant to be used in other collections of mods. Does not conflict with anything, well except for mods that modify T_compass_shadow_battle, T_ThreatGlowing or T_ThreatGray.",
-  changenote: "Initial release",
+  description: `This mod removes threat indicators. Meaning you can no longer see any markers, blue or red compass shadow indicating the presence or absence of enemies or their direction.
+     ---
+     Let's make the game scary again.
+      ---
+      It is meant to be used in other collections of mods. 
+      Does not conflict with anything, well except for mods that modify compass textures.`,
+  changenote: "Remove sound bar, even less indication that you are in/out of combat.",
   entriesTransformer: (entries: EntriesType) => entries,
 };
