@@ -121,12 +121,12 @@ export const transformDynamicItemGenerator: Meta["entriesTransformer"] = (entrie
                   while (e.entries.PossibleItems.entries[i]) {
                     i++;
                   }
-                  /*e.entries.PossibleItems.entries[i] = dummyPossibleItem;
+                  e.entries.PossibleItems.entries[i] = dummyPossibleItem;
                   if (newHeadlessArmors[newArmorSID]) {
                     ab.push(dummyPossibleItem);
                   } else {
                     cd.push(dummyPossibleItem);
-                  }*/
+                  }
                 });
               }
             }
@@ -244,7 +244,7 @@ export const allArmorAdjustedCost = Object.fromEntries(
   })
     .filter((armor) => !armor.entries.SID.includes("Template"))
     .map((armor) => {
-      const backfilled = backfillArmorDef(armor);
+      const backfilled = backfillArmorDef({ ...armor });
       return [armor.entries.SID, calculateArmorScore(backfilled)] as [string, number];
     })
     .sort((a, b) => a[0].localeCompare(b[0])),
