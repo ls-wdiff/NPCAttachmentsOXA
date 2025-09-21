@@ -282,8 +282,10 @@ export const meta: Meta = {
   interestingFiles: ["ArmorPrototypes.cfg", "DynamicItemGenerator.cfg"],
   description: `
     This mod adds armor that does not include helmets, forcing players to wear helmets to have adequate protection.[h2][/h2]
+    It also adds corresponding helmets for exoskeleton and heavy armors, to balance things out.[h2][/h2]
     The armor has no psi and reduced radiation protection, you need to rely on helmets for that.[h2][/h2]
     NPCs can now drop armor and helmets, traders don't sell them.[h2][/h2]
+    These are mostly post-SIRCAA armors and helmets. Thus you can't see them in the first half of the game[h2][/h2]
     The chance of NPCs dropping armor is based on the armor's overall effectiveness, with cheaper armors being more likely to drop.[h2][/h2]
     [h2][/h2]
     For your convenience, here is a set of console commands to spawn the new headless armors directly:[h2][/h2]
@@ -309,7 +311,7 @@ export const meta: Meta = {
    [h2][/h2]
    Modified configs: DynamicItemGenerator.cfg and ArmorPrototypes.cfg
   `,
-  changenote: "Initial commit",
+  changenote: "Add exoskeleton and heavy armor helmets.",
   entriesTransformer: (entries, context) => {
     if (context.filePath.endsWith("ArmorPrototypes.cfg")) {
       return transformArmorPrototypes(entries as ArmorPrototype["entries"], context);
