@@ -1,26 +1,26 @@
-import { Entries } from "s2cfgtojson";
+import { QuestNodePrototype } from "s2cfgtojson";
 
 export const meta = {
   interestingFiles: [
-    "BodyParts_Malahit.cfg",
-    "RSQ01.cfg",
-    "RSQ04.cfg",
-    "RSQ05.cfg",
-    "RSQ06_C00___SIDOROVICH.cfg",
-    "RSQ07_C00_TSEMZAVOD.cfg",
-    "RSQ08_C00_ROSTOK.cfg",
-    "RSQ09_C00_MALAHIT.cfg",
-    "RSQ10_C00_HARPY.cfg",
+    "QuestNodePrototypes/BodyParts_Malahit.cfg",
+    "QuestNodePrototypes/RSQ01.cfg",
+    "QuestNodePrototypes/RSQ04.cfg",
+    "QuestNodePrototypes/RSQ05.cfg",
+    "QuestNodePrototypes/RSQ06_C00___SIDOROVICH.cfg",
+    "QuestNodePrototypes/RSQ07_C00_TSEMZAVOD.cfg",
+    "QuestNodePrototypes/RSQ08_C00_ROSTOK.cfg",
+    "QuestNodePrototypes/RSQ09_C00_MALAHIT.cfg",
+    "QuestNodePrototypes/RSQ10_C00_HARPY.cfg",
   ],
   interestingContents: [],
   prohibitedIds: [],
   interestingIds: [],
   description:
-    "This mod does only one thing: completely eliminates (well, brings it down to about 30 sec - engine limitation) cooldown between barkeep/vendor/mechanic quests. --- Because Waiting Is for the Weak. --- It is meant to be used in other collections of mods. Does not conflict with anything.",
-  changenote: "Update to 1.5.2-v2",
-  entriesTransformer: (entries: Entries) => {
+    "This mod does only one thing: completely eliminates cooldown between barkeep/vendor/mechanic quests.[hr][/hr]Because Waiting Is for the Weak.[hr][/hr]It is meant to be used in other collections of mods. Does not conflict with anything.",
+  changenote: "Update for 1.6",
+  entriesTransformer: (entries: QuestNodePrototype["entries"]) => {
     if (entries.InGameHours) {
-      return { ...entries, InGameHours: 0 };
+      return { InGameHours: 0 };
     }
     return null;
   },

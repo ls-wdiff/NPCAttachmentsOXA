@@ -1,0 +1,33 @@
+import { DifficultyPrototype } from "s2cfgtojson";
+
+export const DIFFICULTY_FACTOR = 4;
+export const meta = {
+  interestingFiles: ["DifficultyPrototypes.cfg"],
+  interestingContents: [],
+  prohibitedIds: [],
+  interestingIds: [],
+  description: `
+This mode does only one thing: increases weapons damage quite a bit on Hard difficulty.
+[hr][/hr]
+🤠 Here’s the deal, kiddo - this mod makes you a glass cannon, so you’re basically one-shotting everything, at the same time you’ll get wrecked by every bullet, every mutant, every *thing* that’s not you.[h1][/h1]
+It’s brutal as hell… but *so* much more satisfying when you pull through.[h1][/h1]
+It’s not for the weak. If you’re struggling? Just switch to Normal mode for that one fight - no shame in that. This thing’s all about fun, not suffering.[h1][/h1]
+Hard mission, but you’ve got this. Now go prove it. 🤠[h1][/h1]
+[h1][/h1]
+Increases damage given and damage taken to 400%
+[hr][/hr]
+Mod is meant to be used in other collections of mods. Does not conflict with anything.
+`,
+  changenote: "Update for 1.6",
+  entriesTransformer: (entries: DifficultyPrototype["entries"]) => {
+    if (entries.SID !== "Hard") {
+      return null;
+    }
+    return {
+      Ammo_Cost: entries.Ammo_Cost,
+      Weapon_BaseDamage: DIFFICULTY_FACTOR,
+      NPC_Weapon_BaseDamage: DIFFICULTY_FACTOR,
+      Mutant_BaseDamage: DIFFICULTY_FACTOR,
+    };
+  },
+};

@@ -1,40 +1,39 @@
-import { Struct, GetStructType } from "s2cfgtojson";
-type TraderEntries = GetStructType<{
-  SID: "BaseTraderNPC_Template";
-  TradeGenerators: {
-    BuyLimitations: ("EItemType::Weapon" | "EItemType::Armor")[];
-  }[];
-}>["entries"];
+import { Struct, EItemType, TradePrototype } from "s2cfgtojson";
 
 export const meta = {
   interestingFiles: ["TradePrototypes"],
   interestingContents: [],
   prohibitedIds: [],
   interestingIds: [],
-  description:
-    "This mode does only one thing: traders don't buy Weapons / Helmets / Armor.\n---\nNo more loot goblin.\n---\nWarning: this makes the game more difficult and interesting.\nMeant to be used in other collections of mods.",
-  changenote: "Bartenders don't buy weapons and armor also. Updated to 1.5.2",
-  entriesTransformer: (entries: TraderEntries) => {
+  description: `
+   This mode does only one thing: traders don't buy Weapons / Helmets / Armor.
+[hr][/hr]
+No more loot goblin.
+[hr][/hr]
+Warning: this makes the game more difficult and interesting.[h1][/h1]
+Meant to be used in other collections of mods.
+   `,
+  changenote: "Updated to 1.6",
+  entriesTransformer: (entries: TradePrototype["entries"]) => {
+    let keepo = null;
     if (entries.TradeGenerators?.entries) {
       Object.values(entries.TradeGenerators.entries)
         .filter((tg) => tg.entries)
         .forEach((tg) => {
-          tg.entries.BuyLimitations ||= new BuyLimitations();
-          const existing = Object.values(tg.entries.BuyLimitations.entries);
-          if (existing.includes("EItemType::Weapon") && existing.includes("EItemType::Armor")) {
-            return;
-          }
-          ["EItemType::Weapon", "EItemType::Armor"].forEach((itemType) => {
-            let i = parseInt(Object.keys(tg.entries.BuyLimitations.entries)[0]) || 0;
+          tg.entries.BuyLimitations ||= new BuyLimitations() as any;
+          let limitations = ["EItemType::Weapon", "EItemType::Armor"];
+
+          limitations.forEach((itemType: EItemType) => {
+            let i = 0;
             while (tg.entries.BuyLimitations.entries[i] && tg.entries.BuyLimitations.entries[i] !== itemType) {
               i++;
             }
             tg.entries.BuyLimitations.entries[i] = itemType;
           });
         });
-      return { TradeGenerators: entries.TradeGenerators };
+      return { TradeGenerators: entries.TradeGenerators, SID: entries.SID };
     }
-    return null;
+    return keepo;
   },
 };
 

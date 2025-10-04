@@ -1,5 +1,6 @@
 import { GetStructType } from "s2cfgtojson";
-import { Meta } from "../../helpers/prepare-configs.mjs";
+
+import { Meta } from "../../helpers/meta.mjs";
 
 type StructType = GetStructType<{
   SID: "0000B69C4A787F9D193CE09A2ACF8951";

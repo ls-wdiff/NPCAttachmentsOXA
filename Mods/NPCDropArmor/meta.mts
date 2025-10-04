@@ -1,5 +1,6 @@
 import { Entries, GetStructType } from "s2cfgtojson";
-import { Meta } from "../../helpers/prepare-configs.mjs";
+
+import { Meta } from "../../helpers/meta.mjs";
 type StructType = GetStructType<{
   SID: "GeneralNPC_Neutral_CloseCombat_ItemGenerator";
   RefreshTime: "1d";

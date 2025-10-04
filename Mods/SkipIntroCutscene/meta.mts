@@ -1,5 +1,6 @@
 import { QuestNodePrototype, Struct } from "s2cfgtojson";
-import { Meta } from "../../helpers/prepare-configs.mjs";
+
+import { Meta } from "../../helpers/meta.mjs";
 type EntriesType = QuestNodePrototype["entries"];
 export const meta: Meta = {
   interestingFiles: ["E01_MQ01.cfg", "FastTravelPrototypes.cfg"],

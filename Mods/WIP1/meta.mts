@@ -1,6 +1,6 @@
 import { EChangeValueMode, EConditionComparance, EDialogAction, EDialogAnimationType, EEmotionalFaceMasks, EQuestConditionType, EQuestNodeType, GetStructType, Struct } from "s2cfgtojson";
-import { Meta } from "../../helpers/prepare-configs.mjs";
 import * as fs from "node:fs";
+import { Meta } from "../../helpers/meta.mjs";
 
 type StructType = GetStructType<{
   SID: string;
