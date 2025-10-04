@@ -1,63 +1,9 @@
-import { ArmorPrototype, createDynamicClassInstance, EItemGenerationCategory, ERank, Struct } from "s2cfgtojson";
-import fs from "node:fs";
+import { ArmorPrototype, DeeplyPartial, EItemGenerationCategory, ERank } from "s2cfgtojson";
+import dotEnv from "dotenv";
 import path from "node:path";
 
-import dotEnv from "dotenv";
-
 dotEnv.config({ path: path.join(import.meta.dirname, "..", ".env") });
-const nestedDir = path.join("Stalker2", "Content", "GameLite");
-const BASE_CFG_DIR = path.join(process.env.SDK_PATH, nestedDir);
-export const allDefaultArmorDefs = Object.fromEntries(
-  (
-    Struct.fromString(
-      [
-        fs.readFileSync(path.join(BASE_CFG_DIR, "GameData", "ItemPrototypes", "ArmorPrototypes.cfg"), "utf8"),
-        //  fs.readFileSync(path.join(BASE_CFG_DIR, "DLCGameData", "Deluxe", "ItemPrototypes", "ArmorPrototypes.cfg"), "utf8"),
-        //  fs.readFileSync(path.join(BASE_CFG_DIR, "DLCGameData", "PreOrder", "ItemPrototypes", "ArmorPrototypes.cfg"), "utf8"),
-        //  fs.readFileSync(path.join(BASE_CFG_DIR, "DLCGameData", "Ultimate", "ItemPrototypes", "ArmorPrototypes.cfg"), "utf8"),
-      ].join("\n"),
-    ) as ArmorPrototype[]
-  ).map((e) => [e.SID, e] as const),
-);
-
-const defaultKeys = new Set(["__internal__"]);
-
-export function backfillArmorDef(armor: Struct): ArmorPrototype {
-  const deepWalk = (obj: ArmorPrototype, cb: (s: string[]) => void, path: string[] = []) =>
-    Object.entries(obj)
-      .filter((e) => !defaultKeys.has(e[0]))
-      .forEach(([k, v]) => {
-        cb(path.concat(k));
-        if (typeof v === "object" && v !== null) {
-          deepWalk(v, cb, path.concat(k));
-        }
-      });
-  const get = (obj: any, path: string[]) => path.reduce((o, k) => o && o[k], obj);
-  const set = (obj: any, path: string[], value: any) => {
-    const lastKey = path.pop();
-    const parent = get(obj, path);
-    if (parent && lastKey) {
-      parent[lastKey] = value;
-    }
-  };
-  deepWalk(allDefaultArmorDefs.HeavyExoskeleton_Svoboda_Armor, (path: string[]) => {
-    let a = armor;
-    while (get(a, path) === undefined) {
-      a = allDefaultArmorDefs[a.__internal__.refkey];
-      if (!a) {
-        return;
-      }
-    }
-    set(armor, path, get(a, path));
-  });
-
-  return armor as ArmorPrototype;
-}
-
-export type DeeplyPartial<T> = {
-  [P in keyof T]?: T[P] extends Array<infer U> ? Array<DeeplyPartial<U>> : T[P] extends ReadonlyArray<infer U> ? ReadonlyArray<DeeplyPartial<U>> : T[P] extends object ? DeeplyPartial<T[P]> : T[P];
-};
-
+const MOD_NAME = process.env.MOD_NAME;
 type ArmorDescriptor = {
   __internal__: {
     refkey: string;
@@ -70,7 +16,7 @@ type ArmorDescriptor = {
 } & DeeplyPartial<Omit<ArmorPrototype, "__internal__">>;
 
 export const newArmors = {
-  BattleExoskeleton_Varta_Armor_MasterMod_headless: {
+  [`BattleExoskeleton_Varta_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "BattleExoskeleton_Varta_Armor",
       _extras: {
@@ -78,7 +24,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "BattleExoskeleton_Varta_Armor_MasterMod_headless",
+    SID: `BattleExoskeleton_Varta_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "BattleExoskeleton_Varta_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_BattleExoskeleton_Varta_Armor_headless.T_IFI_BattleExoskeleton_Varta_Armor_headless'",
@@ -86,7 +32,7 @@ export const newArmors = {
     Cost: 58000,
     Protection: { Radiation: 25, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Mercenaries_Armor_MasterMod_headless: {
+  [`Exoskeleton_Mercenaries_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Exoskeleton_Mercenaries_Armor",
       _extras: {
@@ -94,7 +40,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Exoskeleton_Mercenaries_Armor_MasterMod_headless",
+    SID: `Exoskeleton_Mercenaries_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Exoskeleton_Mercenaries_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Mercenaries_Armor_headless.T_IFI_Exoskeleton_Mercenaries_Armor_headless'",
@@ -102,7 +48,7 @@ export const newArmors = {
     Cost: 50500,
     Protection: { Radiation: 20, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Monolith_Armor_MasterMod_headless: {
+  [`Exoskeleton_Monolith_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Exoskeleton_Monolith_Armor",
       _extras: {
@@ -110,7 +56,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Exoskeleton_Monolith_Armor_MasterMod_headless",
+    SID: `Exoskeleton_Monolith_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Exoskeleton_Monolith_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Monolith_Armor_headless.T_IFI_Exoskeleton_Monolith_Armor_headless'",
@@ -118,7 +64,7 @@ export const newArmors = {
     Cost: 53000,
     Protection: { Radiation: 30, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Neutral_Armor_MasterMod_headless: {
+  [`Exoskeleton_Neutral_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Exoskeleton_Neutral_Armor",
       _extras: {
@@ -126,7 +72,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Exoskeleton_Neutral_Armor_MasterMod_headless",
+    SID: `Exoskeleton_Neutral_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Exoskeleton_Neutral_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Neutral_Armor_headless.T_IFI_Exoskeleton_Neutral_Armor_headless'",
@@ -134,7 +80,7 @@ export const newArmors = {
     Cost: 55500,
     Protection: { Radiation: 20, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Svoboda_Armor_MasterMod_headless: {
+  [`Exoskeleton_Svoboda_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Exoskeleton_Svoboda_Armor",
       _extras: {
@@ -142,7 +88,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Exoskeleton_Svoboda_Armor_MasterMod_headless",
+    SID: `Exoskeleton_Svoboda_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Exoskeleton_Svoboda_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Svoboda_Armor_headless.T_IFI_Exoskeleton_Svoboda_Armor_headless'",
@@ -150,7 +96,7 @@ export const newArmors = {
     Cost: 80000,
     Protection: { Radiation: 25, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Heavy_Dolg_Armor_MasterMod_headless: {
+  [`Heavy_Dolg_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Heavy_Dolg_Armor",
       _extras: {
@@ -158,7 +104,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Heavy_Dolg_Armor_MasterMod_headless",
+    SID: `Heavy_Dolg_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Heavy_Dolg_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_FOL_DOL_03_headless.T_IFI_FOL_DOL_03_headless'",
@@ -166,7 +112,7 @@ export const newArmors = {
     Cost: 35000,
     Protection: { Radiation: 10, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Heavy2_Military_Armor_MasterMod_headless: {
+  [`Heavy2_Military_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Heavy2_Military_Armor",
       _extras: {
@@ -174,7 +120,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Heavy2_Military_Armor_MasterMod_headless",
+    SID: `Heavy2_Military_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Heavy2_Military_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_FOL_MIL_04_headless.T_IFI_FOL_MIL_04_headless'",
@@ -182,7 +128,7 @@ export const newArmors = {
     Cost: 32000,
     Protection: { Radiation: 10, PSY: 0 },
   } satisfies ArmorDescriptor,
-  HeavyAnomaly_Monolith_Armor_MasterMod_headless: {
+  [`HeavyAnomaly_Monolith_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "HeavyAnomaly_Monolith_Armor",
       _extras: {
@@ -190,7 +136,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "HeavyAnomaly_Monolith_Armor_MasterMod_headless",
+    SID: `HeavyAnomaly_Monolith_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "HeavyAnomaly_Monolith_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_FOL_MON_04_headless.T_IFI_FOL_MON_04_headless'",
@@ -198,7 +144,7 @@ export const newArmors = {
     Cost: 42500,
     Protection: { Radiation: 15, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Dolg_Armor_MasterMod_headless: {
+  [`Exoskeleton_Dolg_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Exoskeleton_Dolg_Armor",
       _extras: {
@@ -206,7 +152,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Exoskeleton_Dolg_Armor_MasterMod_headless",
+    SID: `Exoskeleton_Dolg_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Exoskeleton_Dolg_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_FOL_STA_05_headless.T_IFI_FOL_STA_05_headless'",
@@ -214,7 +160,7 @@ export const newArmors = {
     Cost: 70000,
     Protection: { Radiation: 20, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Heavy_Svoboda_Armor_MasterMod_headless: {
+  [`Heavy_Svoboda_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Armor",
       _extras: {
@@ -222,7 +168,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Heavy_Svoboda_Armor_MasterMod_headless",
+    SID: `Heavy_Svoboda_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Heavy_Svoboda_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_FOL_SVO_02_headless.T_IFI_FOL_SVO_02_headless'",
@@ -230,7 +176,7 @@ export const newArmors = {
     Cost: 37000,
     Protection: { Radiation: 15, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Heavy_Mercenaries_Armor_MasterMod_headless: {
+  [`Heavy_Mercenaries_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "Heavy_Mercenaries_Armor",
       _extras: {
@@ -238,7 +184,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "Heavy_Mercenaries_Armor_MasterMod_headless",
+    SID: `Heavy_Mercenaries_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "Heavy_Mercenaries_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Heavy_Mercenaries_Armor_headless.T_IFI_Heavy_Mercenaries_Armor_headless'",
@@ -246,7 +192,7 @@ export const newArmors = {
     Cost: 25500,
     Protection: { Radiation: 10, PSY: 0 },
   } satisfies ArmorDescriptor,
-  HeavyBattle_Spark_Armor_MasterMod_headless: {
+  [`HeavyBattle_Spark_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "HeavyBattle_Spark_Armor",
       _extras: {
@@ -254,7 +200,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "HeavyBattle_Spark_Armor_MasterMod_headless",
+    SID: `HeavyBattle_Spark_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "HeavyBattle_Spark_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyBattle_Spark_Armor_headless.T_IFI_HeavyBattle_Spark_Armor_headless'",
@@ -262,7 +208,7 @@ export const newArmors = {
     Cost: 40500,
     Protection: { Radiation: 15, PSY: 0 },
   } satisfies ArmorDescriptor,
-  HeavyExoskeleton_Dolg_Armor_MasterMod_headless: {
+  [`HeavyExoskeleton_Dolg_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "HeavyExoskeleton_Dolg_Armor",
       _extras: {
@@ -270,7 +216,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "HeavyExoskeleton_Dolg_Armor_MasterMod_headless",
+    SID: `HeavyExoskeleton_Dolg_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "HeavyExoskeleton_Dolg_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyExoskeleton_Dolg_Armor_headless.T_IFI_HeavyExoskeleton_Dolg_Armor_headless'",
@@ -278,7 +224,7 @@ export const newArmors = {
     Cost: 51000,
     Protection: { Radiation: 20, PSY: 0 },
   } satisfies ArmorDescriptor,
-  HeavyExoskeleton_Monolith_Armor_MasterMod_headless: {
+  [`HeavyExoskeleton_Monolith_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "HeavyExoskeleton_Monolith_Armor",
       _extras: {
@@ -286,7 +232,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "HeavyExoskeleton_Monolith_Armor_MasterMod_headless",
+    SID: `HeavyExoskeleton_Monolith_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "HeavyExoskeleton_Monolith_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyExoskeleton_Monolith_Armor_headless.T_IFI_HeavyExoskeleton_Monolith_Armor_headless'",
@@ -294,7 +240,7 @@ export const newArmors = {
     Cost: 55000,
     Protection: { Radiation: 30, PSY: 0 },
   } satisfies ArmorDescriptor,
-  HeavyExoskeleton_Svoboda_Armor_MasterMod_headless: {
+  [`HeavyExoskeleton_Svoboda_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "HeavyExoskeleton_Svoboda_Armor",
       _extras: {
@@ -302,7 +248,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "HeavyExoskeleton_Svoboda_Armor_MasterMod_headless",
+    SID: `HeavyExoskeleton_Svoboda_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "HeavyExoskeleton_Svoboda_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyExoskeleton_Svoboda_Armor_headless.T_IFI_HeavyExoskeleton_Svoboda_Armor_headless'",
@@ -310,7 +256,7 @@ export const newArmors = {
     Cost: 50000,
     Protection: { Radiation: 25, PSY: 0 },
   } satisfies ArmorDescriptor,
-  HeavyExoskeleton_Varta_Armor_MasterMod_headless: {
+  [`HeavyExoskeleton_Varta_Armor_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "BattleExoskeleton_Varta_Armor",
       _extras: {
@@ -318,7 +264,7 @@ export const newArmors = {
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
-    SID: "HeavyExoskeleton_Varta_Armor_MasterMod_headless",
+    SID: `HeavyExoskeleton_Varta_Armor_${MOD_NAME}_headless`,
     LocalizationSID: "BattleExoskeleton_Varta_Armor",
     bBlockHead: false,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyExoskeleton_Varta_Armor_headless.T_IFI_HeavyExoskeleton_Varta_Armor_headless'",
@@ -326,106 +272,124 @@ export const newArmors = {
     Cost: 45500,
     Protection: { Radiation: 25, PSY: 0 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Mercenaries_Helmet_MasterMod: {
+  [`Exoskeleton_Mercenaries_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "Exoskeleton_Mercenaries_Helmet_MasterMod",
+    SID: `Exoskeleton_Mercenaries_Helmet_${MOD_NAME}`,
     LocalizationSID: "Exoskeleton_Mercenaries_Armor",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Merc_Helmet.T_IFI_Exoskeleton_Merc_Helmet'",
     Weight: 5,
     Cost: 45000,
     Protection: { Radiation: 40, PSY: 20, Strike: 4 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Monolith_Helmet_MasterMod: {
+  [`Exoskeleton_Monolith_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "Exoskeleton_Monolith_Helmet_MasterMod",
+    SID: `Exoskeleton_Monolith_Helmet_${MOD_NAME}`,
     LocalizationSID: "Exoskeleton_Monolith_Armor",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Monolith_Helmet.T_IFI_Exoskeleton_Monolith_Helmet'",
     Weight: 5,
     Cost: 45000,
     Protection: { Radiation: 50, PSY: 20, Strike: 4 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Neutral_Helmet_MasterMod: {
+  [`Exoskeleton_Neutral_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "Exoskeleton_Neutral_Helmet_MasterMod",
+    SID: `Exoskeleton_Neutral_Helmet_${MOD_NAME}`,
     LocalizationSID: "Exoskeleton_Neutral_Armor",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Neutral_Helmet.T_IFI_Exoskeleton_Neutral_Helmet'",
     Weight: 5,
     Cost: 40000,
     Protection: { Radiation: 40, PSY: 50, Strike: 4 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Spark_Helmet_MasterMod: {
+  [`Exoskeleton_Spark_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "Exoskeleton_Spark_Helmet_MasterMod",
+    SID: `Exoskeleton_Spark_Helmet_${MOD_NAME}`,
     LocalizationSID: "HeavyBattle_Spark_Armor",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Spark_Helmet.T_IFI_Exoskeleton_Spark_Helmet'",
     Weight: 5,
     Cost: 40000,
     Protection: { Radiation: 35, PSY: 40, Strike: 4 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Duty_Helmet_MasterMod: {
+  [`Exoskeleton_Duty_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "Exoskeleton_Duty_Helmet_MasterMod",
+    SID: `Exoskeleton_Duty_Helmet_${MOD_NAME}`,
     LocalizationSID: "HeavyExoskeleton_Dolg_Armor",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Duty_Helmet.T_IFI_Exoskeleton_Duty_Helmet'",
     Weight: 5,
     Cost: 40000,
     Protection: { Radiation: 40, PSY: 20, Strike: 4 },
   } satisfies ArmorDescriptor,
-  Exoskeleton_Svoboda_Helmet_MasterMod: {
+  [`Exoskeleton_Svoboda_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Heavy_Svoboda_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "Exoskeleton_Svoboda_Helmet_MasterMod",
+    SID: `Exoskeleton_Svoboda_Helmet_${MOD_NAME}`,
     LocalizationSID: "Heavy_Svoboda_Helmet",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Exoskeleton_Svoboda_Helmet.T_IFI_Exoskeleton_Svoboda_Helmet'",
     Weight: 5,
     Cost: 40000,
     Protection: { Radiation: 45, PSY: 40, Strike: 4 },
   } satisfies ArmorDescriptor,
-  HeavyBattle_Spark_Helmet_MasterMod: {
+  [`HeavyBattle_Spark_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Battle_Military_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "HeavyBattle_Spark_Helmet_MasterMod",
+    SID: `HeavyBattle_Spark_Helmet_${MOD_NAME}`,
     LocalizationSID: "Battle_Military_Helmet",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyBattle_Spark_Helmet.T_IFI_HeavyBattle_Spark_Helmet'",
   } satisfies ArmorDescriptor,
-  HeavyBattle_Merc_Helmet_MasterMod: {
+  [`HeavyBattle_Merc_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Battle_Military_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "HeavyBattle_Merc_Helmet_MasterMod",
+    SID: `HeavyBattle_Merc_Helmet_${MOD_NAME}`,
     LocalizationSID: "Battle_Military_Helmet",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyBattle_Merc_Helmet.T_IFI_HeavyBattle_Merc_Helmet'",
   } satisfies ArmorDescriptor,
-  HeavyBattle_Dolg_Helmet_MasterMod: {
+  [`HeavyBattle_Dolg_Helmet_${MOD_NAME}`]: {
     __internal__: {
       refkey: "Battle_Military_Helmet",
-      _extras: { ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" } },
+      _extras: {
+        ItemGenerator: { Category: "EItemGenerationCategory::Head", PlayerRank: "ERank::Veteran, ERank::Master" },
+      },
     },
-    SID: "HeavyBattle_Dolg_Helmet_MasterMod",
+    SID: `HeavyBattle_Dolg_Helmet_${MOD_NAME}`,
     LocalizationSID: "Battle_Military_Helmet",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_HeavyBattle_Dolg_Helmet.T_IFI_HeavyBattle_Dolg_Helmet'",
   } satisfies ArmorDescriptor,
-  SkinCloak_Bandit_Armor_MasterMod: {
+  [`SkinCloak_Bandit_Armor_${MOD_NAME}`]: {
     __internal__: {
       refkey: "SkinJacket_Bandit_Armor",
       _extras: {
@@ -435,13 +399,13 @@ export const newArmors = {
         },
       },
     },
-    SID: "SkinCloak_Bandit_Armor_MasterMod",
+    SID: `SkinCloak_Bandit_Armor_${MOD_NAME}`,
     LocalizationSID: "SkinJacket_Bandit_Armor",
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Cape_Bandit_Armor.T_IFI_Cape_Bandit_Armor'",
     MeshGenerator: { "0": { MeshGeneratorPrototypeSID: "BAN_03_a_MeshGenerator", Weight: 1 } },
     bBlockHead: true,
   } satisfies ArmorDescriptor,
-  SkinCloak_Bandit_Armor2_MasterMod_headless: {
+  [`SkinCloak_Bandit_Armor2_${MOD_NAME}_headless`]: {
     __internal__: {
       refkey: "SkinJacket_Bandit_Armor",
       _extras: {
@@ -452,7 +416,7 @@ export const newArmors = {
         },
       },
     },
-    SID: "SkinCloak_Bandit_Armor2_MasterMod_headless",
+    SID: `SkinCloak_Bandit_Armor2_${MOD_NAME}_headless`,
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Cape2_Bandit_Armor.T_IFI_Cape2_Bandit_Armor'",
     LocalizationSID: "SkinJacket_Bandit_Armor",
     MeshGenerator: { "0": { MeshGeneratorPrototypeSID: "BAN_04_a_MeshGenerator", Weight: 1 } },
@@ -478,41 +442,53 @@ export const extraArmorsByFaction: {
         refkey: "HeavyBattle_Spark_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "HeavyBattle_Spark_Armor_MasterMod_NPC",
+      SID: `HeavyBattle_Spark_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Battle_Spark_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie, ERank::Experienced" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Newbie, ERank::Experienced",
+          },
         },
       },
-      SID: "Battle_Spark_Armor_MasterMod_NPC",
+      SID: `Battle_Spark_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "HeavyAnomaly_Spark_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" },
+        },
       },
-      SID: "HeavyAnomaly_Spark_Armor_MasterMod_NPC",
+      SID: `HeavyAnomaly_Spark_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "SEVA_Spark_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" },
+        },
       },
-      SID: "SEVA_Spark_Armor_MasterMod_NPC",
+      SID: `SEVA_Spark_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_HeavyExoskeleton_Spark_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
       },
-      SID: "NPC_HeavyExoskeleton_Spark_Armor_MasterMod_NPC",
+      SID: `NPC_HeavyExoskeleton_Spark_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
@@ -524,153 +500,194 @@ export const extraArmorsByFaction: {
           },
         },
       },
-      SID: "NPC_Spark_Armor_MasterMod_NPC",
+      SID: `NPC_Spark_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Anomaly_Spark_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie, ERank::Experienced" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Newbie, ERank::Experienced",
+          },
+        },
       },
-      SID: "NPC_Anomaly_Spark_Armor_MasterMod_NPC",
+      SID: `NPC_Anomaly_Spark_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.HeavyBattle_Spark_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Spark_Helmet_MasterMod,
-    newArmors.HeavyBattle_Spark_Helmet_MasterMod,
+    newArmors[`HeavyBattle_Spark_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Spark_Helmet_${MOD_NAME}`],
+    newArmors[`HeavyBattle_Spark_Helmet_${MOD_NAME}`],
   ],
   neutral: [
     {
       __internal__: {
         refkey: "Jemmy_Neutral_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" },
+        },
       },
-      SID: "Jemmy_Neutral_Armor_MasterMod_NPC",
+      SID: `Jemmy_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Newbee_Neutral_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" },
+        },
       },
-      SID: "Newbee_Neutral_Armor_MasterMod_NPC",
+      SID: `Newbee_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Nasos_Neutral_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" },
+        },
       },
-      SID: "Nasos_Neutral_Armor_MasterMod_NPC",
+      SID: `Nasos_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Zorya_Neutral_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" },
+        },
       },
-      SID: "Zorya_Neutral_Armor_MasterMod_NPC",
+      SID: `Zorya_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "SEVA_Neutral_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" },
+        },
       },
-      SID: "SEVA_Neutral_Armor_MasterMod_NPC",
+      SID: `SEVA_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Exoskeleton_Neutral_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" },
+        },
       },
-      SID: "Exoskeleton_Neutral_Armor_MasterMod_NPC",
+      SID: `Exoskeleton_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Sel_Neutral_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
       },
-      SID: "NPC_Sel_Neutral_Armor_MasterMod_NPC",
+      SID: `NPC_Sel_Neutral_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Cloak_Heavy_Neutral_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" } },
       },
-      SID: "NPC_Cloak_Heavy_Neutral_Armor_MasterMod_NPC",
+      SID: `NPC_Cloak_Heavy_Neutral_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.Exoskeleton_Neutral_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Neutral_Helmet_MasterMod,
+    newArmors[`Exoskeleton_Neutral_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Neutral_Helmet_${MOD_NAME}`],
   ],
   bandit: [
     {
       __internal__: {
         refkey: "SkinJacket_Bandit_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" },
+        },
       },
-      SID: "SkinJacket_Bandit_Armor_MasterMod_NPC",
+      SID: `SkinJacket_Bandit_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Jacket_Bandit_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced, ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Experienced, ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "Jacket_Bandit_Armor_MasterMod_NPC",
+      SID: `Jacket_Bandit_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Middle_Bandit_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced, ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Experienced, ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "Middle_Bandit_Armor_MasterMod_NPC",
+      SID: `Middle_Bandit_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_SkinCloak_Bandit_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
       },
-      SID: "NPC_SkinCloak_Bandit_Armor_MasterMod_NPC",
+      SID: `NPC_SkinCloak_Bandit_Armor_${MOD_NAME}_NPC`,
     },
-    /*  newArmors.SkinCloak_Bandit_Armor_MasterMod,
-    newArmors.SkinCloak_Bandit_Armor2_MasterMod_headless,*/
+    newArmors[`SkinCloak_Bandit_Armor_${MOD_NAME}`],
+    newArmors[`SkinCloak_Bandit_Armor2_${MOD_NAME}_headless`],
   ],
   mercenary: [
     {
       __internal__: {
         refkey: "Light_Mercenaries_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" },
+        },
       },
-      SID: "Light_Mercenaries_Armor_MasterMod_NPC",
+      SID: `Light_Mercenaries_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Exoskeleton_Mercenaries_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" },
+        },
       },
-      SID: "Exoskeleton_Mercenaries_Armor_MasterMod_NPC",
+      SID: `Exoskeleton_Mercenaries_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Heavy_Mercenaries_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "Heavy_Mercenaries_Armor_MasterMod_NPC",
+      SID: `Heavy_Mercenaries_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_HeavyExoskeleton_Mercenaries_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
       },
-      SID: "NPC_HeavyExoskeleton_Mercenaries_Armor_MasterMod_NPC",
+      SID: `NPC_HeavyExoskeleton_Mercenaries_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.Heavy_Mercenaries_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Mercenaries_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Mercenaries_Helmet_MasterMod,
-    newArmors.HeavyBattle_Merc_Helmet_MasterMod,
+    newArmors[`Heavy_Mercenaries_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Mercenaries_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Mercenaries_Helmet_${MOD_NAME}`],
+    newArmors[`HeavyBattle_Merc_Helmet_${MOD_NAME}`],
   ],
   military: [
     {
@@ -678,79 +695,123 @@ export const extraArmorsByFaction: {
         refkey: "Default_Military_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie, ERank::Experienced" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Newbie, ERank::Experienced",
+          },
         },
       },
-      SID: "Default_Military_Armor_MasterMod_NPC",
+      SID: `Default_Military_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Heavy2_Military_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "Heavy2_Military_Armor_MasterMod_NPC",
+      SID: `Heavy2_Military_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Heavy_Military_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Heavy_Military_Armor_MasterMod_NPC",
+      SID: `NPC_Heavy_Military_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Cloak_Heavy_Military_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Cloak_Heavy_Military_Armor_MasterMod_NPC",
+      SID: `NPC_Cloak_Heavy_Military_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.Heavy2_Military_Armor_MasterMod_headless,
+    newArmors[`Heavy2_Military_Armor_${MOD_NAME}_headless`],
   ],
   corpus: [
     {
       __internal__: {
         refkey: "NPC_Heavy_Corps_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Heavy_Corps_Armor_MasterMod_NPC",
+      SID: `NPC_Heavy_Corps_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Heavy3_Corps_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Heavy3_Corps_Armor_MasterMod_NPC",
+      SID: `NPC_Heavy3_Corps_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Heavy2_Coprs_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Heavy2_Coprs_Armor_MasterMod_NPC",
+      SID: `NPC_Heavy2_Coprs_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Heavy3Exoskeleton_Coprs_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Heavy3Exoskeleton_Coprs_Armor_MasterMod_NPC",
+      SID: `NPC_Heavy3Exoskeleton_Coprs_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Exoskeleton_Coprs_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_Exoskeleton_Coprs_Armor_MasterMod_NPC",
+      SID: `NPC_Exoskeleton_Coprs_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Battle_Dolg_End_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" },
+        },
       },
-      SID: "Battle_Dolg_End_Armor_MasterMod_NPC",
+      SID: `Battle_Dolg_End_Armor_${MOD_NAME}_NPC`,
     },
   ],
   scientist: [
@@ -759,30 +820,39 @@ export const extraArmorsByFaction: {
         refkey: "Anomaly_Scientific_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie, ERank::Experienced" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Newbie, ERank::Experienced",
+          },
         },
       },
-      SID: "Anomaly_Scientific_Armor_MasterMod_NPC",
+      SID: `Anomaly_Scientific_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "HeavyAnomaly_Scientific_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced, ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Experienced, ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "HeavyAnomaly_Scientific_Armor_MasterMod_NPC",
+      SID: `HeavyAnomaly_Scientific_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "SciSEVA_Scientific_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "SciSEVA_Scientific_Armor_MasterMod_NPC",
+      SID: `SciSEVA_Scientific_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
@@ -794,150 +864,196 @@ export const extraArmorsByFaction: {
           },
         },
       },
-      SID: "NPC_Sci_Armor_MasterMod_NPC",
+      SID: `NPC_Sci_Armor_${MOD_NAME}_NPC`,
     },
   ],
   freedom: [
     {
       __internal__: {
         refkey: "Rook_Svoboda_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" },
+        },
       },
-      SID: "Rook_Svoboda_Armor_MasterMod_NPC",
+      SID: `Rook_Svoboda_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Battle_Svoboda_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" },
+        },
       },
-      SID: "Battle_Svoboda_Armor_MasterMod_NPC",
+      SID: `Battle_Svoboda_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "SEVA_Svoboda_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran" },
+        },
       },
-      SID: "SEVA_Svoboda_Armor_MasterMod_NPC",
+      SID: `SEVA_Svoboda_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Heavy_Svoboda_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "Heavy_Svoboda_Armor_MasterMod_NPC",
+      SID: `Heavy_Svoboda_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "HeavyExoskeleton_Svoboda_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" },
+        },
       },
-      SID: "HeavyExoskeleton_Svoboda_Armor_MasterMod_NPC",
+      SID: `HeavyExoskeleton_Svoboda_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Exoskeleton_Svoboda_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
       },
-      SID: "Exoskeleton_Svoboda_Armor_MasterMod_NPC",
+      SID: `Exoskeleton_Svoboda_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.Exoskeleton_Svoboda_Armor_MasterMod_headless,
-    newArmors.HeavyExoskeleton_Svoboda_Armor_MasterMod_headless,
-    newArmors.Heavy_Svoboda_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Svoboda_Helmet_MasterMod,
+    newArmors[`Exoskeleton_Svoboda_Armor_${MOD_NAME}_headless`],
+    newArmors[`HeavyExoskeleton_Svoboda_Armor_${MOD_NAME}_headless`],
+    newArmors[`Heavy_Svoboda_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Svoboda_Helmet_${MOD_NAME}`],
   ],
   duty: [
     {
       __internal__: {
         refkey: "Rook_Dolg_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie" },
+        },
       },
-      SID: "Rook_Dolg_Armor_MasterMod_NPC",
+      SID: `Rook_Dolg_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Battle_Dolg_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" },
+        },
       },
-      SID: "Battle_Dolg_Armor_MasterMod_NPC",
+      SID: `Battle_Dolg_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "SEVA_Dolg_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Experienced" },
+        },
       },
-      SID: "SEVA_Dolg_Armor_MasterMod_NPC",
+      SID: `SEVA_Dolg_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Heavy_Dolg_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "Heavy_Dolg_Armor_MasterMod_NPC",
+      SID: `Heavy_Dolg_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "HeavyExoskeleton_Dolg_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" },
+        },
       },
-      SID: "HeavyExoskeleton_Dolg_Armor_MasterMod_NPC",
+      SID: `HeavyExoskeleton_Dolg_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Exoskeleton_Dolg_Armor",
-        _extras: { isDroppable: false, ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
+        _extras: {
+          isDroppable: false,
+          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" },
+        },
       },
-      SID: "Exoskeleton_Dolg_Armor_MasterMod_NPC",
+      SID: `Exoskeleton_Dolg_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.Exoskeleton_Dolg_Armor_MasterMod_headless,
-    newArmors.HeavyExoskeleton_Dolg_Armor_MasterMod_headless,
-    newArmors.Heavy_Dolg_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Duty_Helmet_MasterMod,
-    newArmors.HeavyBattle_Dolg_Helmet_MasterMod,
+    newArmors[`Exoskeleton_Dolg_Armor_${MOD_NAME}_headless`],
+    newArmors[`HeavyExoskeleton_Dolg_Armor_${MOD_NAME}_headless`],
+    newArmors[`Heavy_Dolg_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Duty_Helmet_${MOD_NAME}`],
+    newArmors[`HeavyBattle_Dolg_Helmet_${MOD_NAME}`],
   ],
   monolith: [
     {
       __internal__: {
         refkey: "NPC_Battle_Noon_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie, ERank::Experienced" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Newbie, ERank::Experienced",
+          },
+        },
       },
-      SID: "NPC_Battle_Noon_Armor_MasterMod_NPC",
+      SID: `NPC_Battle_Noon_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_HeavyAnomaly_Noon_Armor",
-        _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" } },
+        _extras: {
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
+        },
       },
-      SID: "NPC_HeavyAnomaly_Noon_Armor_MasterMod_NPC",
+      SID: `NPC_HeavyAnomaly_Noon_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_HeavyExoskeleton_Noon_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
       },
-      SID: "NPC_HeavyExoskeleton_Noon_Armor_MasterMod_NPC",
+      SID: `NPC_HeavyExoskeleton_Noon_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "NPC_Exoskeleton_Noon_Armor",
         _extras: { ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Master" } },
       },
-      SID: "NPC_Exoskeleton_Noon_Armor_MasterMod_NPC",
+      SID: `NPC_Exoskeleton_Noon_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "Battle_Monolith_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Newbie, ERank::Experienced" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Newbie, ERank::Experienced",
+          },
         },
       },
-      SID: "Battle_Monolith_Armor_MasterMod_NPC",
+      SID: `Battle_Monolith_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
@@ -950,17 +1066,20 @@ export const extraArmorsByFaction: {
           },
         },
       },
-      SID: "HeavyAnomaly_Monolith_Armor_MasterMod_NPC",
+      SID: `HeavyAnomaly_Monolith_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "HeavyExoskeleton_Monolith_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "HeavyExoskeleton_Monolith_Armor_MasterMod_NPC",
+      SID: `HeavyExoskeleton_Monolith_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
@@ -973,12 +1092,12 @@ export const extraArmorsByFaction: {
           },
         },
       },
-      SID: "Exoskeleton_Monolith_Armor_MasterMod_NPC",
+      SID: `Exoskeleton_Monolith_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.Exoskeleton_Monolith_Armor_MasterMod_headless,
-    newArmors.HeavyExoskeleton_Monolith_Armor_MasterMod_headless,
-    newArmors.HeavyAnomaly_Monolith_Armor_MasterMod_headless,
-    newArmors.Exoskeleton_Monolith_Helmet_MasterMod,
+    newArmors[`Exoskeleton_Monolith_Armor_${MOD_NAME}_headless`],
+    newArmors[`HeavyExoskeleton_Monolith_Armor_${MOD_NAME}_headless`],
+    newArmors[`HeavyAnomaly_Monolith_Armor_${MOD_NAME}_headless`],
+    newArmors[`Exoskeleton_Monolith_Helmet_${MOD_NAME}`],
   ],
   varta: [
     {
@@ -992,20 +1111,23 @@ export const extraArmorsByFaction: {
           },
         },
       },
-      SID: "Battle_Varta_Armor_MasterMod_NPC",
+      SID: `Battle_Varta_Armor_${MOD_NAME}_NPC`,
     },
     {
       __internal__: {
         refkey: "BattleExoskeleton_Varta_Armor",
         _extras: {
           isDroppable: false,
-          ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
+          ItemGenerator: {
+            Category: "EItemGenerationCategory::BodyArmor",
+            PlayerRank: "ERank::Veteran, ERank::Master",
+          },
         },
       },
-      SID: "BattleExoskeleton_Varta_Armor_MasterMod_NPC",
+      SID: `BattleExoskeleton_Varta_Armor_${MOD_NAME}_NPC`,
     },
-    newArmors.BattleExoskeleton_Varta_Armor_MasterMod_headless,
-    newArmors.HeavyExoskeleton_Varta_Armor_MasterMod_headless,
+    newArmors[`BattleExoskeleton_Varta_Armor_${MOD_NAME}_headless`],
+    newArmors[`HeavyExoskeleton_Varta_Armor_${MOD_NAME}_headless`],
   ],
 };
 
@@ -1022,67 +1144,3 @@ export const allExtraArmors = [
   ...extraArmorsByFaction.varta,
   ...extraArmorsByFaction.spark,
 ];
-
-export const allArmorRank = Object.fromEntries(
-  Object.values({
-    ...allDefaultArmorDefs,
-    ...Object.fromEntries(
-      allExtraArmors.map((e) => {
-        const SID = e.SID;
-        const refkey = e.__internal__.refkey;
-        const dummy = createDynamicClassInstance(SID) as ArmorPrototype;
-        dummy.SID = SID;
-        dummy.__internal__.refkey = refkey;
-
-        return [SID, dummy] as [string, ArmorPrototype];
-      }),
-    ),
-    ...newArmors,
-  })
-    .filter((armor) => !armor.SID.includes("Template"))
-    .map((armor) => {
-      const backfilled = backfillArmorDef(JSON.parse(JSON.stringify(armor))) as ArmorPrototype;
-      return [armor.SID, calculateArmorScore(backfilled)] as [string, number];
-    })
-    .sort((a, b) => a[0].localeCompare(b[0])),
-);
-
-export function calculateArmorScore(armor: ArmorPrototype): number {
-  const e = armor;
-  const protectionNormalization = { Burn: 100, Shock: 100, ChemicalBurn: 100, Radiation: 100, PSY: 100, Strike: 5, Fall: 100 };
-  const protectionScales = { Burn: 5, Shock: 7, ChemicalBurn: 5, Radiation: 10, PSY: 10, Strike: 63, Fall: 1 };
-  const protectionScore = Object.keys(protectionScales).reduce((sum, key) => {
-    const normalized = (protectionScales[key] * e.Protection[key]) / protectionNormalization[key];
-    return sum + normalized / 100;
-  }, 0);
-  const durabilityScore = ((e.BaseDurability || minDurability) - minDurability) / (maxDurability - minDurability);
-  const weightScore = Math.atan(10e10) - Math.atan((e.Weight + 4.31) / 6.73);
-  const blockHeadScore = e.bBlockHead ? 1 : 0;
-  const speedScore = e.IncreaseSpeedCoef ?? 0; // always 1
-  const noiseScore = e.NoiseCoef ?? 0; // always 1
-  const slotsScore =
-    ((e.ArtifactSlots ?? 0) +
-      Object.values(e.UpgradePrototypeSIDs || {})
-        .filter((u) => typeof u === "string")
-        .filter((u) => u.toLowerCase().includes("container") || u.toLowerCase().includes("_artifact")).length) /
-    10; // 1 to 2
-  const preventLimping = e.bPreventFromLimping && !Object.values(e.UpgradePrototypeSIDs || {}).find((u) => typeof u === "string" && u.includes("AddRunEffect")) ? 0 : 1;
-
-  const costScore = Math.atan(10e10) - Math.atan((e.Cost + 27025) / 42000);
-  const scoreScales = {
-    costScore: 7.5,
-    protectionScore: 50,
-    durabilityScore: 7.5,
-    weightScore: 5,
-    slotsScore: 25,
-    blockHeadScore: 2.5,
-    preventLimping: 2.5,
-    speedScore: 0,
-    noiseScore: 0,
-  };
-  const scoreKeys = { costScore, protectionScore, durabilityScore, weightScore, slotsScore, blockHeadScore, preventLimping, speedScore, noiseScore };
-  const score = Object.keys(scoreKeys).reduce((sum, e) => sum + scoreKeys[e] * scoreScales[e], 0);
-  return score / 100; // 0 to 1
-}
-const maxDurability = Math.max(...Object.values(allDefaultArmorDefs).map((a) => a.BaseDurability ?? 0));
-const minDurability = Math.min(...Object.values(allDefaultArmorDefs).map((a) => a.BaseDurability ?? 10000));

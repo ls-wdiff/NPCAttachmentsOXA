@@ -23,10 +23,6 @@ const emptyMeta = `
   };
 `.trim();
 
-const readOneFile = (file: string) => {
-  return fs.readFileSync(file, "utf8");
-};
-
 function getCfgFiles() {
   const cfgFiles = [];
   function scanAllDirs(start: string) {
@@ -120,5 +116,4 @@ getCfgFiles()
   });
 meta.onFinish?.();
 
-//await import("./packmod.mjs");
 await import("./push-to-sdk.mts");

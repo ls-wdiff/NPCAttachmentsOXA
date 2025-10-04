@@ -1,16 +1,21 @@
 import { DynamicItemGenerator, GetStructType, Struct } from "s2cfgtojson";
 import { factions } from "./factions.mjs";
-import { allArmorRank, extraArmorsByFaction, newArmors } from "./armors.util.mjs";
+import { extraArmorsByFaction, newArmors } from "./armors.util.mjs";
 import { PossibleItem } from "./possibleItem.mjs";
 import { semiRandom } from "../../helpers/semi-random.mjs";
 
 import { undroppableArmors } from "./undroppableArmors.mjs";
 import { precision } from "./precision.mjs";
+import { allArmorRank } from "./allArmorRank.mjs";
 
 /**
  * Allows NPCs to drop armor and helmets.
  */
-export const transformArmor = (struct: DynamicItemGenerator, itemGenerator: DynamicItemGenerator["ItemGenerator"][number], i: number) => {
+export const transformArmor = (
+  struct: DynamicItemGenerator,
+  itemGenerator: DynamicItemGenerator["ItemGenerator"][number],
+  i: number,
+) => {
   if (
     struct.SID.includes("WeaponPistol") ||
     struct.SID.includes("Consumables") ||
@@ -25,7 +30,9 @@ export const transformArmor = (struct: DynamicItemGenerator, itemGenerator: Dyna
   fork.bAllowSameCategoryGeneration = true;
   fork.PlayerRank = itemGenerator.PlayerRank;
   fork.Category = itemGenerator.Category;
-  fork.PossibleItems = itemGenerator.PossibleItems.filter((e): e is any => !!(e[1] && allArmorRank[e[1].ItemPrototypeSID]));
+  fork.PossibleItems = itemGenerator.PossibleItems.filter(
+    (e): e is any => !!(e[1] && allArmorRank[e[1].ItemPrototypeSID]),
+  );
   const options = fork.PossibleItems.entries().map(([_k, v]) => v);
 
   const weights = Object.fromEntries(
@@ -62,7 +69,10 @@ export const transformArmor = (struct: DynamicItemGenerator, itemGenerator: Dyna
       weights[newArmorSID] = getChanceForSID(allArmorRank[newArmorSID] ? newArmorSID : originalSID);
       const maybeNewArmor = newArmors[newArmorSID] as typeof descriptor;
 
-      if (fork.Category === (maybeNewArmor?.__internal__._extras?.ItemGenerator?.Category || "EItemGenerationCategory::BodyArmor")) {
+      if (
+        fork.Category ===
+        (maybeNewArmor?.__internal__._extras?.ItemGenerator?.Category || "EItemGenerationCategory::BodyArmor")
+      ) {
         fork.PossibleItems.addNode(dummyPossibleItem, newArmorSID);
         if (maybeNewArmor || descriptor.__internal__._extras.isDroppable) {
           droppableArmors.push(dummyPossibleItem as any);

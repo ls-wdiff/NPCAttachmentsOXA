@@ -1,9 +1,11 @@
 import { Meta } from "../../helpers/meta.mjs";
 import { ArmorPrototype, Struct } from "s2cfgtojson";
-import { allDefaultArmorDefs, allExtraArmors, backfillArmorDef, newArmors } from "./armors.util.mjs";
+import { allExtraArmors, newArmors } from "./armors.util.mjs";
 import { deepMerge } from "../../helpers/deepMerge.mjs";
 import { undroppableArmors } from "./undroppableArmors.mjs";
 import { get } from "./get.mjs";
+import { backfillArmorDef } from "./backfillArmorDef.mjs";
+import { allDefaultArmorDefs } from "./allDefaultArmorDefs.mjs";
 
 /**
  * Adds armor that doesn't block head, but also removes any psy protection. Allows player to use helmets.
