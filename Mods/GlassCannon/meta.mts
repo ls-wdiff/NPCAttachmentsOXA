@@ -1,11 +1,8 @@
 import { DifficultyPrototype } from "s2cfgtojson";
+import { MetaType } from "../../src/metaType.mjs";
 
 export const DIFFICULTY_FACTOR = 4;
-export const meta = {
-  interestingFiles: ["DifficultyPrototypes.cfg"],
-  interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+export const meta: MetaType<DifficultyPrototype> = {
   description: `
 This mode does only one thing: increases weapons damage quite a bit on Hard difficulty.
 [hr][/hr]
@@ -18,16 +15,20 @@ Increases damage given and damage taken to 400%
 [hr][/hr]
 Mod is meant to be used in other collections of mods. Does not conflict with anything.
 `,
-  changenote: "Update for 1.6",
-  entriesTransformer: (entries: DifficultyPrototype["entries"]) => {
-    if (entries.SID !== "Hard") {
-      return null;
-    }
-    return {
-      Ammo_Cost: entries.Ammo_Cost,
-      Weapon_BaseDamage: DIFFICULTY_FACTOR,
-      NPC_Weapon_BaseDamage: DIFFICULTY_FACTOR,
-      Mutant_BaseDamage: DIFFICULTY_FACTOR,
-    };
-  },
+  changenote: "Fix ammo prices",
+  structTransformers: [structTransformer],
 };
+
+function structTransformer(struct: DifficultyPrototype) {
+  if (struct.SID !== "Hard") {
+    return null;
+  }
+  return Object.assign(struct.fork(), {
+    Weapon_BaseDamage: DIFFICULTY_FACTOR,
+    NPC_Weapon_BaseDamage: DIFFICULTY_FACTOR,
+    Mutant_BaseDamage: DIFFICULTY_FACTOR,
+  } as Partial<DifficultyPrototype>);
+}
+
+structTransformer._name = "GlassCannon";
+structTransformer.files = ["/DifficultyPrototypes.cfg"];
