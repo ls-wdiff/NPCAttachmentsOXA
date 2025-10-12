@@ -1,27 +1,29 @@
 import { QuestNodePrototype } from "s2cfgtojson";
+import { MetaType } from "../../src/metaType.mjs";
 
-export const meta = {
-  interestingFiles: [
-    "QuestNodePrototypes/BodyParts_Malahit.cfg",
-    "QuestNodePrototypes/RSQ01.cfg",
-    "QuestNodePrototypes/RSQ04.cfg",
-    "QuestNodePrototypes/RSQ05.cfg",
-    "QuestNodePrototypes/RSQ06_C00___SIDOROVICH.cfg",
-    "QuestNodePrototypes/RSQ07_C00_TSEMZAVOD.cfg",
-    "QuestNodePrototypes/RSQ08_C00_ROSTOK.cfg",
-    "QuestNodePrototypes/RSQ09_C00_MALAHIT.cfg",
-    "QuestNodePrototypes/RSQ10_C00_HARPY.cfg",
-  ],
-  interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+export const meta: MetaType<QuestNodePrototype> = {
   description:
-    "This mod does only one thing: completely eliminates cooldown between barkeep/vendor/mechanic quests.[hr][/hr]Because Waiting Is for the Weak.[hr][/hr]It is meant to be used in other collections of mods. Does not conflict with anything.",
-  changenote: "Update for 1.6",
-  entriesTransformer: (entries: QuestNodePrototype["entries"]) => {
-    if (entries.InGameHours) {
-      return { InGameHours: 0 };
-    }
-    return null;
-  },
+    "This mod does only one thing: completely eliminates cooldown between barkeep/vendor/mechanic quests.[hr][/hr]Because Waiting Is for the Weak.[hr][/hr]It is meant to be used in other collections of mods. Modifies recurring quest node InGameHours.",
+  changenote: "Update with bpatch for higher compatibility.",
+  structTransformers: [noQuestCooldownTransformer],
 };
+
+function noQuestCooldownTransformer(struct: QuestNodePrototype) {
+  if (struct.InGameHours) {
+    return Object.assign(struct.fork(), { InGameHours: 0 });
+  }
+  return null;
+}
+
+noQuestCooldownTransformer._name = "NoQuestCooldown";
+noQuestCooldownTransformer.files = [
+  "/QuestNodePrototypes/BodyParts_Malahit.cfg",
+  "/QuestNodePrototypes/RSQ01.cfg",
+  "/QuestNodePrototypes/RSQ04.cfg",
+  "/QuestNodePrototypes/RSQ05.cfg",
+  "/QuestNodePrototypes/RSQ06_C00___SIDOROVICH.cfg",
+  "/QuestNodePrototypes/RSQ07_C00_TSEMZAVOD.cfg",
+  "/QuestNodePrototypes/RSQ08_C00_ROSTOK.cfg",
+  "/QuestNodePrototypes/RSQ09_C00_MALAHIT.cfg",
+  "/QuestNodePrototypes/RSQ10_C00_HARPY.cfg",
+];

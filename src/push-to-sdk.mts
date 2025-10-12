@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import { logger } from "./logger.mjs";
 import { modName, sdkModsFolder, modFolderRaw } from "./base-paths.mjs";
 import { mkdirSync } from "fs";
-import { copyFileSync, cpSync } from "node:fs";
+import { cpSync, rmSync } from "node:fs";
 
 const cmd = () => {
   const destinationPath = path.join(sdkModsFolder, modName, "Content", "GameLite", "GameData");
@@ -13,6 +13,9 @@ const cmd = () => {
   if (fs.readdirSync(sourcePath).length === 0) {
     console.error(`No files found in source path: ${sourcePath}`);
     process.exit(1);
+  }
+  if (fs.statSync(destinationPath).isDirectory()) {
+    rmSync(destinationPath, { recursive: true });
   }
   mkdirSync(destinationPath, { recursive: true });
   cpSync(path.join(sourcePath), path.join(destinationPath), { recursive: true });

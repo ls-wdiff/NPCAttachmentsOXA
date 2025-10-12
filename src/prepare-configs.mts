@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import { spawnSync } from "child_process";
-import { modFolderSteam } from "./base-paths.mjs";
+import { modFolderRaw, modFolderSteam } from "./base-paths.mjs";
 import { getCfgFileProcessor } from "./get-cfg-file-processor.mjs";
 import { logger } from "./logger.mjs";
 import { onL2Finish } from "./l2-cache.mjs";
@@ -11,6 +11,7 @@ import { metaPromise } from "./metaPromise.mjs";
 
 console.time();
 const { meta } = await metaPromise;
+if (fs.existsSync(modFolderRaw)) fs.rmSync(modFolderRaw, { recursive: true });
 if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: true });
 
 const total = await Promise.all(
