@@ -19,7 +19,7 @@ const cmd = () => {
   vdfData.workshopitem.publishedfileid ||= "0"; // This will be set by SteamCMD
   vdfData.workshopitem.contentfolder = modFolderSteam;
   vdfData.workshopitem.previewfile = path.join(modFolder, "512.png");
-  vdfData.workshopitem.title = sanitize(`${modName.replace(/([A-Z])/g, " $1").trim()} by sdwvit`);
+  vdfData.workshopitem.title = sanitize(`${modName.replace(/([A-Z]\w])/g, " $1").trim()} by sdwvit`);
   vdfData.workshopitem.description = sanitize(meta.description);
   vdfData.workshopitem.changenote = sanitize(meta.changenote);
 
