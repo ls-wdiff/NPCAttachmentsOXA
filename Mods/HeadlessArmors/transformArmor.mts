@@ -2,11 +2,11 @@ import { DynamicItemGenerator, GetStructType, Struct } from "s2cfgtojson";
 import { factions } from "./factions.mjs";
 import { extraArmorsByFaction, newArmors } from "./armors.util.mjs";
 import { PossibleItem } from "./possibleItem.mjs";
-import { semiRandom } from "../../helpers/semi-random.mjs";
 
 import { undroppableArmors } from "./undroppableArmors.mjs";
 import { precision } from "./precision.mjs";
 import { allArmorRank } from "./allArmorRank.mjs";
+import { semiRandom } from "../../src/semi-random.mjs";
 
 /**
  * Allows NPCs to drop armor and helmets.
@@ -48,7 +48,7 @@ export const transformArmor = (
 
   extraArmors
     .filter((descriptor) => {
-      const descriptorRank = descriptor.__internal__._extras.ItemGenerator?.PlayerRank;
+      const descriptorRank = descriptor.__internal__._extras?.ItemGenerator?.PlayerRank;
       const igRank = fork.PlayerRank;
 
       return descriptorRank && igRank

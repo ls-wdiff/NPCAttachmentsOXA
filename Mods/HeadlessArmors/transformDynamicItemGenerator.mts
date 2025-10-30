@@ -1,13 +1,12 @@
-import { Meta } from "../../helpers/meta.mjs";
 import { DynamicItemGenerator, Struct } from "s2cfgtojson";
 import { transformArmor } from "./transformArmor.mjs";
 import { addMissingCategories } from "./addMissingCategories.mjs";
+import { EntriesTransformer } from "../../src/metaType.mjs";
 
 /**
- * Does not allow traders to sell gear.
  * Allows NPCs to drop armor.
  */
-export const transformDynamicItemGenerator: Meta<DynamicItemGenerator>["entriesTransformer"] = (struct) => {
+export const transformDynamicItemGenerator: EntriesTransformer<DynamicItemGenerator> = (struct) => {
   if (struct.SID.includes("Trade")) {
     return;
   }
@@ -23,9 +22,15 @@ export const transformDynamicItemGenerator: Meta<DynamicItemGenerator>["entriesT
     }
   });
 
-  if (!ItemGenerator.entries().length || !ItemGenerator.filter((e): e is any => !!(e[1].PossibleItems as Struct).entries().length).entries().length) {
+  if (
+    !ItemGenerator.entries().length ||
+    !ItemGenerator.filter((e): e is any => !!(e[1].PossibleItems as Struct).entries().length).entries().length
+  ) {
     return;
   }
 
   return Object.assign(struct.fork(), { ItemGenerator });
 };
+
+transformDynamicItemGenerator._name = " Allows NPCs to drop armor.";
+transformDynamicItemGenerator.files = ["/DynamicItemGenerator.cfg"];

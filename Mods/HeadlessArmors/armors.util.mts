@@ -1,6 +1,7 @@
 import { ArmorPrototype, DeeplyPartial, EItemGenerationCategory, ERank } from "s2cfgtojson";
 import dotEnv from "dotenv";
 import path from "node:path";
+import { allDefaultArmorDefs } from "./allDefaultArmorDefs.mjs";
 
 dotEnv.config({ path: path.join(import.meta.dirname, "..", ".env") });
 const MOD_NAME = process.env.MOD_NAME;
@@ -8,7 +9,7 @@ type ArmorDescriptor = {
   __internal__: {
     refkey: string;
     _extras?: {
-      keysForRemoval?: Record<string, string | number>;
+      keysForRemoval?: Record<string, string | number | string[] | number[]>;
       ItemGenerator?: { Category: `${EItemGenerationCategory}`; PlayerRank: `${ERank}` };
       isDroppable?: boolean;
     };
@@ -20,7 +21,11 @@ export const newArmors = {
     __internal__: {
       refkey: "BattleExoskeleton_Varta_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["BattleExoskeleton_Varta_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -36,7 +41,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Exoskeleton_Mercenaries_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Exoskeleton_Mercenaries_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -52,7 +61,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Exoskeleton_Monolith_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Exoskeleton_Monolith_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -68,7 +81,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Exoskeleton_Neutral_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Exoskeleton_Neutral_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -84,7 +101,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Exoskeleton_Svoboda_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Exoskeleton_Svoboda_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -100,7 +121,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Heavy_Dolg_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Heavy_Dolg_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -116,7 +141,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Heavy2_Military_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Heavy2_Military_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -132,7 +161,11 @@ export const newArmors = {
     __internal__: {
       refkey: "HeavyAnomaly_Monolith_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["HeavyAnomaly_Monolith_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -148,7 +181,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Exoskeleton_Dolg_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Exoskeleton_Dolg_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -164,7 +201,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Heavy_Svoboda_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Heavy_Svoboda_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -180,7 +221,11 @@ export const newArmors = {
     __internal__: {
       refkey: "Heavy_Mercenaries_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Heavy_Mercenaries_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -196,7 +241,11 @@ export const newArmors = {
     __internal__: {
       refkey: "HeavyBattle_Spark_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["HeavyBattle_Spark_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -212,7 +261,11 @@ export const newArmors = {
     __internal__: {
       refkey: "HeavyExoskeleton_Dolg_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["HeavyExoskeleton_Dolg_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -228,7 +281,11 @@ export const newArmors = {
     __internal__: {
       refkey: "HeavyExoskeleton_Monolith_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["HeavyExoskeleton_Monolith_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -244,7 +301,11 @@ export const newArmors = {
     __internal__: {
       refkey: "HeavyExoskeleton_Svoboda_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["HeavyExoskeleton_Svoboda_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -260,7 +321,11 @@ export const newArmors = {
     __internal__: {
       refkey: "BattleExoskeleton_Varta_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["BattleExoskeleton_Varta_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: { Category: "EItemGenerationCategory::BodyArmor", PlayerRank: "ERank::Veteran, ERank::Master" },
       },
     },
@@ -409,7 +474,11 @@ export const newArmors = {
     __internal__: {
       refkey: "SkinJacket_Bandit_Armor",
       _extras: {
-        keysForRemoval: { "entries.UpgradePrototypeSIDs.entries": "FaustPsyResist_Quest_1_1" },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["SkinJacket_Bandit_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
         ItemGenerator: {
           Category: "EItemGenerationCategory::BodyArmor",
           PlayerRank: "ERank::Newbie, ERank::Experienced, ERank::Veteran, ERank::Master",
@@ -420,6 +489,27 @@ export const newArmors = {
     Icon: "Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Cape2_Bandit_Armor.T_IFI_Cape2_Bandit_Armor'",
     LocalizationSID: "SkinJacket_Bandit_Armor",
     MeshGenerator: { "0": { MeshGeneratorPrototypeSID: "BAN_04_a_MeshGenerator", Weight: 1 } },
+  } satisfies ArmorDescriptor,
+  [`Battle_Dolg_End_Armor_${MOD_NAME}_headless`]: {
+    __internal__: {
+      refkey: "Battle_Dolg_End_Armor",
+      _extras: {
+        ItemGenerator: {
+          Category: "EItemGenerationCategory::BodyArmor",
+          PlayerRank: "ERank::Veteran, ERank::Master",
+        },
+        keysForRemoval: {
+          UpgradePrototypeSIDs: allDefaultArmorDefs["Anomaly_Scientific_Armor"].UpgradePrototypeSIDs.entries()
+            .map(([_, k]) => k)
+            .filter((k) => !!k.toLowerCase().match(/psyresist|_ps[iy]_/g)),
+        },
+      },
+    },
+    SID: `Battle_Dolg_End_Armor_${MOD_NAME}_headless`,
+    LocalizationSID: "Battle_Dolg_End_Armor",
+    bBlockHead: false,
+    Protection: { Radiation: 40, PSY: 0 },
+    Cost: 70000,
   } satisfies ArmorDescriptor,
 };
 
@@ -1002,6 +1092,7 @@ export const extraArmorsByFaction: {
     newArmors[`Heavy_Dolg_Armor_${MOD_NAME}_headless`],
     newArmors[`Exoskeleton_Duty_Helmet_${MOD_NAME}`],
     newArmors[`HeavyBattle_Dolg_Helmet_${MOD_NAME}`],
+    newArmors[`Battle_Dolg_End_Armor_${MOD_NAME}_headless`],
   ],
   monolith: [
     {

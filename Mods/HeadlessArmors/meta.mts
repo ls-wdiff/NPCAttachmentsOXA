@@ -1,13 +1,12 @@
-import { ArmorPrototype, DynamicItemGenerator } from "s2cfgtojson";
 import path from "node:path";
 import dotEnv from "dotenv";
 import { transformDynamicItemGenerator } from "./transformDynamicItemGenerator.mjs";
 import { transformArmorPrototypes } from "./transformArmorPrototypes.mjs";
+import { MetaType } from "../../src/metaType.mjs";
 
 dotEnv.config({ path: path.join(import.meta.dirname, "..", ".env") });
 
-export const meta = {
-  interestingFiles: ["ArmorPrototypes.cfg", "DynamicItemGenerator.cfg"],
+export const meta: MetaType = {
   description: `
     This mod adds armor that does not include helmets, forcing players to wear helmets to have adequate protection.[h2][/h2]
     It also adds corresponding helmets for exoskeleton and heavy armors, to balance things out.[h2][/h2]
@@ -36,6 +35,7 @@ export const meta = {
     XSpawnItemNearPlayerBySID HeavyExoskeleton_Monolith_Armor_HeadlessArmors_headless
     XSpawnItemNearPlayerBySID HeavyExoskeleton_Svoboda_Armor_HeadlessArmors_headless
     XSpawnItemNearPlayerBySID HeavyExoskeleton_Varta_Armor_HeadlessArmors_headless
+    XSpawnItemNearPlayerBySID Battle_Dolg_End_Armor_HeadlessArmors_headless
     
     Helmets: 
     XSpawnItemNearPlayerBySID Exoskeleton_Neutral_Helmet_HeadlessArmors
@@ -51,14 +51,6 @@ export const meta = {
    [h2][/h2]
    Modified configs through refkeys: DynamicItemGenerator.cfg and ArmorPrototypes.cfg
   `,
-  changenote: "Armors drop again",
-  entriesTransformer: (entries, context) => {
-    if (context.filePath.endsWith("ArmorPrototypes.cfg")) {
-      return transformArmorPrototypes(entries as ArmorPrototype, context);
-    }
-    if (context.filePath.endsWith("DynamicItemGenerator.cfg")) {
-      return transformDynamicItemGenerator(entries as DynamicItemGenerator, context);
-    }
-    return null;
-  },
+  changenote: "Fix price for Battle_Dolg_End_Armor_HeadlessArmors_headless",
+  structTransformers: [transformArmorPrototypes, transformDynamicItemGenerator],
 };
