@@ -14,7 +14,7 @@ const cmd = () => {
     console.error(`No files found in source path: ${sourcePath}`);
     process.exit(1);
   }
-  if (fs.statSync(destinationPath).isDirectory()) {
+  if (fs.existsSync(destinationPath) && fs.statSync(destinationPath).isDirectory()) {
     rmSync(destinationPath, { recursive: true });
   }
   mkdirSync(destinationPath, { recursive: true });
