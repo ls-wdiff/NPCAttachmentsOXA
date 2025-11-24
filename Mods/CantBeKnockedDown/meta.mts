@@ -1,10 +1,7 @@
-import { Entries, Struct } from "s2cfgtojson";
+import { ObjPrototype } from "s2cfgtojson";
+import { MetaType } from "../../src/metaType.mjs";
 
-export const meta = {
-  interestingFiles: ["GameData/ObjPrototypes.cfg", "ObjPrototypes/GeneralNPCObjPrototypes.cfg"],
-  interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+export const meta: MetaType<ObjPrototype> = {
   description: `
 This mode does only one thing: it makes you unable to be knocked down by any NPCs, or mutants, including bosses. [h1][/h1]
 Bloodsuckers won't bully you anymore.
@@ -17,11 +14,14 @@ Bloodsuckers won't bully you anymore.
 [hr][/hr]
 It is meant to be used in other collections of mods. Does not conflict with anything. It's a combo of two one-line patches: one for player and one for npcs, sets CanBeKnockedDown to false. 
   `,
-  changenote: "Update for 1.6",
-  entriesTransformer: (entries: Entries) => {
-    if (entries.SID === "NPCBase" || entries.SID === "Player") {
-      return { CanBeKnockedDown: false, SID: entries.SID };
-    }
-    return null;
-  },
+  changenote: "Update for 1.7.1",
+  structTransformers: [entriesTransformer],
 };
+
+function entriesTransformer(struct: ObjPrototype) {
+  if (struct.SID === "NPCBase" || struct.SID === "Player") {
+    return Object.assign(struct.fork(), { CanBeKnockedDown: false });
+  }
+}
+
+entriesTransformer.files = ["GameData/ObjPrototypes.cfg", "ObjPrototypes/GeneralNPCObjPrototypes.cfg"];

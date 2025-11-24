@@ -1,12 +1,9 @@
-import { Entries, Struct } from "s2cfgtojson";
+import { ObjPrototype } from "s2cfgtojson";
+import { MetaType } from "../../src/metaType.mjs";
 
-export const meta = {
-  interestingFiles: ["GameData/ObjPrototypes.cfg", "ObjPrototypes/GeneralNPCObjPrototypes.cfg"],
-  interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
-  description: `
-  
+export const meta: MetaType<ObjPrototype> = {
+  structTransformers: [entriesTransformer],
+  description: ` 
   This mode does only one thing: Eliminates all damage from falling at any height. [h1][/h1]
 [hr][/hr]
 [list]
@@ -19,16 +16,15 @@ export const meta = {
 It is meant to be used in other collections of mods. [h1][/h1]
 I consider this mod to be a bit cheaty, and/or useful for debugging other mods.
   `,
-  changenote: "Update for 1.6",
-  entriesTransformer: (entries: Entries) => {
-    if (entries.SID === "NPCBase" || entries.SID === "Player") {
-      class Protection extends Struct<{ Fall: number }> {
-        _id: string = "Protection";
-        entries = { Fall: 100 };
-      }
-
-      return { Protection: new Protection(), SID: entries.SID };
-    }
-    return null;
-  },
+  changenote: "Update for 1.7.1",
 };
+
+function entriesTransformer(struct: ObjPrototype) {
+  if (struct.SID === "NPCBase" || struct.SID === "Player") {
+    return Object.assign(struct.fork(), {
+      Protection: Object.assign(struct.fork(), { Fall: 100 }),
+    });
+  }
+}
+
+entriesTransformer.files = ["GameData/ObjPrototypes.cfg", "ObjPrototypes/GeneralNPCObjPrototypes.cfg"];

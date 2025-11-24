@@ -3,10 +3,11 @@ import dotEnv from "dotenv";
 import { transformDynamicItemGenerator } from "./transformDynamicItemGenerator.mjs";
 import { transformArmorPrototypes } from "./transformArmorPrototypes.mjs";
 import { MetaType } from "../../src/metaType.mjs";
+import { ArmorPrototype, DynamicItemGenerator } from "s2cfgtojson";
 
 dotEnv.config({ path: path.join(import.meta.dirname, "..", ".env") });
 
-export const meta: MetaType = {
+export const meta: MetaType<ArmorPrototype | DynamicItemGenerator> = {
   description: `
     This mod adds armor that does not include helmets, forcing players to wear helmets to have adequate protection.[h2][/h2]
     It also adds corresponding helmets for exoskeleton and heavy armors, to balance things out.[h2][/h2]

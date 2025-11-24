@@ -15,7 +15,7 @@ Increases damage given and damage taken to 400%
 [hr][/hr]
 Mod is meant to be used in other collections of mods. Does not conflict with anything.
 `,
-  changenote: "Fix ammo prices",
+  changenote: "Update for 1.7.1, support master difficulty",
   structTransformers: [structTransformer],
 };
 
