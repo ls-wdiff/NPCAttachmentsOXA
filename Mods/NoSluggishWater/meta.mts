@@ -10,7 +10,7 @@ export const meta: MetaType<Struct> = {
       [hr][/hr]
       Uses bpatch on ObjPrototypes.cfg
   `,
-  changenote: "Initial release",
+  changenote: "Update to 1.7.x",
   structTransformers: [transformObjPrototypes],
 };
 

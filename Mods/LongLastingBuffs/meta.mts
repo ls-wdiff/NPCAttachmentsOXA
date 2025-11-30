@@ -62,5 +62,5 @@ export const meta: MetaType<EffectPrototype> = {
   [*] 🏋️ Hercules: Weight buff duration increased from 5 minutes to 50 minutes
   [/list]
   bPatches EffectPrototypes.cfg`,
-  changenote: "Compatible with 1.7.1",
+  changenote: "Compatible with 1.7.x",
 };

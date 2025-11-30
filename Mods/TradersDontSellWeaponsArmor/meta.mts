@@ -1,10 +1,7 @@
-import { DynamicItemGenerator, ERank, ESpawnType, GetStructType } from "s2cfgtojson";
+import { DynamicItemGenerator } from "s2cfgtojson";
+import { MetaType } from "../../src/metaType.mjs";
 
-export const meta = {
-  interestingFiles: ["DynamicItemGenerator.cfg"],
-  interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+export const meta: MetaType<DynamicItemGenerator> = {
   description: `
     This mode does only one thing: traders no longer sell you weapons or armor.
 [hr][/hr]
@@ -12,37 +9,58 @@ export const meta = {
 [hr][/hr]
 It is meant to be used in other collections of mods.
     `,
-  changenote: "Update for 1.6",
-  entriesTransformer: (entries: DynamicItemGenerator["entries"]) => {
-    if (entries.SID.includes("Trade")) {
-      transformTrade(entries);
-    } else {
-      return null;
-    }
-
-    if (Object.values(entries.ItemGenerator.entries).every((e) => Object.keys(e.entries || {}).length === 0)) {
-      return null;
-    }
-    return entries;
-  },
+  changenote: "Update for 1.7.x",
+  structTransformers: [transformDynamicItemGenerator],
 };
 
-const transformTrade = (entries: DynamicItemGenerator["entries"]) => {
-  Object.values(entries.ItemGenerator.entries)
-    .filter((e) => e.entries)
-    .forEach((e) => {
-      // noinspection FallThroughInSwitchStatementJS
-      switch (e.entries?.Category) {
-        case "EItemGenerationCategory::BodyArmor":
-        case "EItemGenerationCategory::Head":
-        case "EItemGenerationCategory::WeaponPrimary":
-        case "EItemGenerationCategory::WeaponPistol":
-        case "EItemGenerationCategory::WeaponSecondary":
-          e.entries = { ReputationThreshold: 1000000 } as unknown as typeof e.entries;
-          break;
-        default:
-          e.entries = {} as unknown as typeof e.entries;
-          break;
+const transformTrade = (struct: DynamicItemGenerator) => {
+  const fork = struct.fork();
+  if (!struct.RefreshTime) {
+    fork.RefreshTime = "1d";
+  }
+  const ItemGenerator = struct.ItemGenerator.map(([_k, e]) => {
+    // noinspection FallThroughInSwitchStatementJS
+    switch (e.Category) {
+      case "EItemGenerationCategory::BodyArmor":
+      case "EItemGenerationCategory::Head":
+      case "EItemGenerationCategory::WeaponPrimary":
+      case "EItemGenerationCategory::WeaponPistol":
+      case "EItemGenerationCategory::WeaponSecondary":
+        return Object.assign(e.fork(), { ReputationThreshold: 1000000 });
+      case "EItemGenerationCategory::SubItemGenerator": {
+        const PossibleItems = (e.PossibleItems as DynamicItemGenerator["ItemGenerator"]["0"]["PossibleItems"]).map(
+          ([_k, pi]) => {
+            if (pi.ItemGeneratorPrototypeSID?.includes("Gun")) {
+              return Object.assign(pi.fork(), { Chance: 0 }); // Disable gun sell
+            }
+          },
+        );
+        if (!PossibleItems.entries().length) {
+          return;
+        }
+        PossibleItems.__internal__.bpatch = true;
+        return Object.assign(e.fork(), { PossibleItems });
       }
-    });
+    }
+  });
+  if (!ItemGenerator.entries().length) {
+    return;
+  }
+  ItemGenerator.__internal__.bpatch = true;
+  return Object.assign(fork, { ItemGenerator });
 };
+
+/**
+ * Does not allow traders to sell gear.
+ * Allows NPCs to drop armor.
+ */
+export function transformDynamicItemGenerator(struct: DynamicItemGenerator) {
+  /**
+   * Does not allow traders to sell gear.
+   */
+  if (struct.SID.includes("Trade")) {
+    return transformTrade(struct);
+  }
+}
+
+transformDynamicItemGenerator.files = ["/DynamicItemGenerator.cfg", "QuestItemGeneratorPrototypes.cfg"];

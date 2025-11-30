@@ -4,7 +4,7 @@ import { MetaType } from "../../src/metaType.mjs";
 export const DIFFICULTY_FACTOR = 4;
 export const meta: MetaType<DifficultyPrototype> = {
   description: `
-This mode does only one thing: increases weapons damage quite a bit on Hard difficulty.
+This mode does only one thing: increases weapons damage quite a bit on Hard/Master difficulty.
 [hr][/hr]
 🤠 Here’s the deal, kiddo - this mod makes you a glass cannon, so you’re basically one-shotting everything, at the same time you’ll get wrecked by every bullet, every mutant, every *thing* that’s not you.[h1][/h1]
 It’s brutal as hell… but *so* much more satisfying when you pull through.[h1][/h1]

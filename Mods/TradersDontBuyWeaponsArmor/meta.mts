@@ -1,10 +1,25 @@
-import { Struct, EItemType, TradePrototype } from "s2cfgtojson";
+import { Struct, TradePrototype } from "s2cfgtojson";
+import { MetaType } from "../../src/metaType.mjs";
+type TG = TradePrototype["TradeGenerators"]["0"];
+function entriesTransformer(struct: TradePrototype) {
+  if (!struct.TradeGenerators) {
+    return null;
+  }
+  const fork = struct.fork();
+  fork.TradeGenerators = struct.TradeGenerators.map((_) => {
+    const tg = new Struct() as TG;
+    tg.BuyLimitations ||= new Struct() as TG["BuyLimitations"];
+    tg.BuyLimitations.addNode("EItemType::Weapon");
+    tg.BuyLimitations.addNode("EItemType::Armor");
+    return tg;
+  });
+  fork.TradeGenerators.__internal__.bpatch = true;
+  return fork;
+}
 
-export const meta = {
-  interestingFiles: ["TradePrototypes"],
-  interestingContents: [],
-  prohibitedIds: [],
-  interestingIds: [],
+entriesTransformer.files = ["/TradePrototypes.cfg"];
+
+export const meta: MetaType<TradePrototype> = {
   description: `
    This mode does only one thing: traders don't buy Weapons / Helmets / Armor.
 [hr][/hr]
@@ -13,31 +28,6 @@ No more loot goblin.
 Warning: this makes the game more difficult and interesting.[h1][/h1]
 Meant to be used in other collections of mods.
    `,
-  changenote: "Updated to 1.6",
-  entriesTransformer: (entries: TradePrototype["entries"]) => {
-    let keepo = null;
-    if (entries.TradeGenerators?.entries) {
-      Object.values(entries.TradeGenerators.entries)
-        .filter((tg) => tg.entries)
-        .forEach((tg) => {
-          tg.entries.BuyLimitations ||= new BuyLimitations() as any;
-          let limitations = ["EItemType::Weapon", "EItemType::Armor"];
-
-          limitations.forEach((itemType: EItemType) => {
-            let i = 0;
-            while (tg.entries.BuyLimitations.entries[i] && tg.entries.BuyLimitations.entries[i] !== itemType) {
-              i++;
-            }
-            tg.entries.BuyLimitations.entries[i] = itemType;
-          });
-        });
-      return { TradeGenerators: entries.TradeGenerators, SID: entries.SID };
-    }
-    return keepo;
-  },
+  changenote: "Updated to 1.7.x",
+  structTransformers: [entriesTransformer],
 };
-
-class BuyLimitations extends Struct {
-  _id = "BuyLimitations";
-  entries: Record<number, string> = { 0: "EItemType::Weapon", 1: "EItemType::Armor" };
-}
