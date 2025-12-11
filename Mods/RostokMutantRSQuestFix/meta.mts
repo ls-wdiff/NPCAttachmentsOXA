@@ -1,7 +1,7 @@
 import { MetaType } from "../../src/metaType.mjs";
 import { GetStructType, QuestNodePrototype, Struct, Condition } from "s2cfgtojson";
 
-export const meta: MetaType = {
+export const meta: MetaType<QuestNodePrototype> = {
   description: `
     Rostok Mutant RS Quest Fix
     [hr][/hr]

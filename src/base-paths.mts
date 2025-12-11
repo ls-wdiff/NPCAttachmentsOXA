@@ -14,3 +14,4 @@ export const modFolderRaw = path.join(projectRoot, "Mods", modName, "raw");
 
 export const sdkStagedFolder = path.join(process.env.SDK_PATH, "Stalker2", "SavedMods", "Staged");
 export const sdkModsFolder = path.join(process.env.SDK_PATH, "Stalker2", "Mods");
+export const validMods = JSON.parse(process.env.VALID_MODS || "[]") as string[];

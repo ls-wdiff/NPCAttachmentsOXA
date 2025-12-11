@@ -12,9 +12,10 @@ Adds various attachments to TOZ
 [hr][/hr]
 bPatches:
  [list]
- [*] WeaponGeneralSetupPrototypes.cfg
- [*] UpgradePrototypes.cfg
- [*] AttachPrototypes.cfg
+  [*] WeaponGeneralSetupPrototypes.cfg
+  [*] UpgradePrototypes.cfg
+  [*] AttachPrototypes.cfg
+  [*] NPCPrototypes.cfg
  [/list]
 `,
   changenote: "Initial release",
