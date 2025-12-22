@@ -1,11 +1,11 @@
 import { EntriesTransformer, MetaContext, MetaType } from "../../src/metaType.mjs";
 import { CluePrototype, QuestNodePrototype, SpawnActorPrototype, Struct } from "s2cfgtojson";
 import { allStashes } from "./stashes.mts";
-import { QuestDataTable, QuestDataTableByQuestSID } from "./rewardFormula.mts";
 import { modName } from "../../src/base-paths.mts";
 import { getLaunchers } from "../../src/struct-utils.mts";
 import { waitFor } from "../../src/waitFor.mts";
 import { precision } from "../../src/precision.mts";
+import { QuestDataTable } from "../MasterMod/rewardFormula.mts";
 const finishedTransformers = new Set<string>();
 
 export const meta: MetaType<Struct> = {

@@ -11,7 +11,7 @@ export type MetaContext<T> = {
 export type EntriesTransformer<T> = ((
   entries: T,
   context: MetaContext<T>,
-) => Struct | null | void | Promise<void | Struct | null>) & {
+) => Struct | Struct[] | null | void | Promise<void | Struct | Struct[] | null>) & {
   contains?: boolean;
   contents?: string[];
   files: string[];

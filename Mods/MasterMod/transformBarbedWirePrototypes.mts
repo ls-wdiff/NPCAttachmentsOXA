@@ -1,0 +1,18 @@
+import { BarbedWirePrototype } from "s2cfgtojson";
+import { EntriesTransformer } from "../../src/metaType.mts";
+
+/**
+ * Remove barbed wire bleeding and armor damage
+ */
+export const transformBarbedWirePrototypes: EntriesTransformer<BarbedWirePrototype> = async (struct) => {
+  if (struct.SID !== "Empty") return null;
+  const fork = struct.fork();
+
+  if (struct.BleedingChance) fork.BleedingChance = 0.0001;
+  if (struct.BleedingValue) fork.BleedingValue = 0.0001;
+  if (struct.ArmorDamage) fork.ArmorDamage = 0.0001;
+
+  return fork;
+};
+
+transformBarbedWirePrototypes.files = ["/BarbedWirePrototypes.cfg"];

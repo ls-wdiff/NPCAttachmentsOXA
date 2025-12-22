@@ -16,18 +16,12 @@ export const L1CacheState = {
  */
 export const L1Cache: Record<string, Struct[]> = fs.existsSync(L1CacheFileName)
   ? Object.fromEntries(
-      JSON.parse(await readWithUnzip(L1CacheFileName)).map(([k, v]: [string, any]) => [
-        k,
-        v.map((e: any) => Struct.fromJson(e, true)),
-      ]),
+      JSON.parse(await readWithUnzip(L1CacheFileName)).map(([k, v]: [string, any]) => [k, v.map((e: any) => Struct.fromJson(e, true))]),
     )
   : {};
 
 export const onL1Finish = () => {
   if (!L1CacheState.needsUpdate) return;
   logger.log("Writing L1 cache to " + L1CacheFileName);
-  return writeWithZip(
-    L1CacheFileName,
-    JSON.stringify(Object.entries(L1Cache).map(([k, v]) => [k, v.map((e) => e.toJson(true))])),
-  );
+  return writeWithZip(L1CacheFileName, JSON.stringify(Object.entries(L1Cache).map(([k, v]) => [k, v.map((e) => e.toJson(true))])));
 };

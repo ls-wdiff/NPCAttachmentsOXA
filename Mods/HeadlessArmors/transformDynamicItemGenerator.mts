@@ -1,7 +1,7 @@
 import { DynamicItemGenerator, Struct } from "s2cfgtojson";
-import { adjustArmorItemGenerator } from "./adjustArmorItemGenerator.mjs";
-import { addMissingCategories } from "./addMissingCategories.mjs";
 import { EntriesTransformer } from "../../src/metaType.mjs";
+import { adjustArmorItemGenerator } from "../MasterMod/adjustArmorItemGenerator.mts";
+import { addMissingCategories } from "../../src/addMissingCategories.mts";
 
 /**
  * Allows NPCs to drop armor.

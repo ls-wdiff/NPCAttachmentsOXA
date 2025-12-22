@@ -7,10 +7,7 @@ import { L1Cache, L1CacheState } from "./l1-cache.mjs";
 import { logger } from "./logger.mjs";
 import { readFile } from "node:fs/promises";
 
-export const readFileAndGetStructs = async <T extends Struct>(
-  filePath: string,
-  filePreprocess?: (fileContents: string) => string,
-): Promise<T[]> => {
+export const readFileAndGetStructs = async <T extends Struct>(filePath: string, filePreprocess?: (fileContents: string) => string): Promise<T[]> => {
   let fullPath = path.join(baseCfgDir, "GameData", filePath);
 
   if (!existsSync(fullPath)) {

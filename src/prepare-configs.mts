@@ -1,3 +1,5 @@
+console.time();
+
 import * as fs from "node:fs";
 import { spawnSync } from "child_process";
 import { modFolderRaw, modFolderSteam } from "./base-paths.mjs";
@@ -8,14 +10,11 @@ import { onL1Finish } from "./l1-cache.mjs";
 import { metaPromise } from "./metaPromise.mjs";
 import { processOneTransformer } from "./process-one-transformer.mjs";
 
-console.time();
 const { meta } = await metaPromise;
-if (fs.existsSync(modFolderRaw)) fs.rmSync(modFolderRaw, { recursive: true });
+if (fs.existsSync(modFolderRaw)) fs.rmSync(modFolderRaw, { recursive: true, force: true });
 if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: true });
 
-const total = await Promise.all(
-  meta.structTransformers.map((t) => processOneTransformer(t).finally(() => meta.onTransformerFinish?.(t))),
-);
+const total = await Promise.all(meta.structTransformers.map((t) => processOneTransformer(t).finally(() => meta.onTransformerFinish?.(t))));
 
 meta.onFinish?.();
 console.timeEnd();

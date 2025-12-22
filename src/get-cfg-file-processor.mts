@@ -13,52 +13,52 @@ const mkdir = promisify(fs.mkdir);
 const writeFile = promisify(fs.writeFile);
 
 export function getCfgFileProcessor<T extends Struct>(transformer: EntriesTransformer<T>) {
+  type OneT = Struct | T | Struct[] | T[] | void | null | void[] | null[];
+
   return async function processOneCfgFile(filePath: string, fileIndex: number): Promise<Struct[]> {
     const pathToSave = path.parse(filePath.slice(baseCfgDir.length + 1));
-    const rawContent = await readFile(filePath, "utf8");
-
-    if (transformer.contents?.length && !transformer.contents.some((c) => rawContent.includes(c))) {
-      return [];
-    }
 
     if (!(filePath.includes("SpawnActorPrototypes/WorldMap_WP/") && !filePath.endsWith("0.cfg"))) {
       logger.log(`Processing file: ${filePath}`);
     }
-    if (!L1Cache[filePath]?.length) {
+    if (!L1Cache[filePath]) {
       L1CacheState.needsUpdate = true;
+      const rawContent = await readFile(filePath, "utf8");
+      if (transformer.contents?.length && !transformer.contents.some((c) => rawContent.includes(c))) {
+        L1Cache[filePath] = [];
+        return [];
+      }
       L1Cache[filePath] = Struct.fromString(rawContent) as T[];
     }
 
     const array = L1Cache[filePath] as T[];
     const structsById: Record<string, T> = Object.fromEntries(array.map((s) => [s.__internal__.rawName, s as T]));
-    const extraStructs = [];
-    const processedStructs: Struct[] = [];
+    const extraStructs: T[] = [];
+
+    const promises: Promise<OneT>[] = [];
 
     for (let index = 0; index < array.length; index++) {
       const s = array[index];
       const id = s.__internal__.rawName;
       if (!id) continue;
-      const clone = s.fork(true);
-      clone.__internal__.rawName = id;
-      clone.__internal__.refkey = id;
-      clone.__internal__.refurl = "../" + pathToSave.base;
 
-      const processedStruct = await transformer(clone as T, {
-        index,
-        fileIndex,
-        array,
-        filePath,
-        structsById,
-        extraStructs,
-      });
-      if (processedStruct) {
-        delete processedStruct.__internal__.refkey;
-        delete processedStruct.__internal__.refurl;
-        processedStructs.push(processedStruct);
-      }
+      promises.push(
+        Promise.resolve(transformer(s as T, { index, fileIndex, array, filePath, structsById, extraStructs })).then((ps) => {
+          s.__internal__.refurl = "../" + pathToSave.base;
+          return ps;
+        }),
+      );
     }
 
-    processedStructs.push(...extraStructs.filter(Boolean));
+    const processedStructs = (await Promise.all(promises))
+      .map((pss) => {
+        if (pss) {
+          return (Array.isArray(pss) ? pss : [pss]).flat().concat(extraStructs).filter(Boolean);
+        }
+      })
+      .flat()
+      .filter(Boolean) as Struct[];
+
     if (processedStructs.length) {
       const cfgEnclosingFolder = path.join(modFolderRaw, rawCfgEnclosingFolder, pathToSave.dir, pathToSave.name);
 

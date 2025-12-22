@@ -1,9 +1,9 @@
 import path from "node:path";
 import dotEnv from "dotenv";
 import { transformDynamicItemGenerator } from "./transformDynamicItemGenerator.mjs";
-import { transformArmorPrototypes } from "./transformArmorPrototypes.mjs";
 import { MetaType } from "../../src/metaType.mjs";
 import { ArmorPrototype, DynamicItemGenerator } from "s2cfgtojson";
+import { transformArmorPrototypes } from "../MasterMod/transformArmorPrototypes.mts";
 
 dotEnv.config({ path: path.join(import.meta.dirname, "..", ".env") });
 
