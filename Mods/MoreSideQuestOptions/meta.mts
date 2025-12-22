@@ -1,12 +1,8 @@
 import { MetaType } from "../../src/metaType.mjs";
 import { DialogPrototype, QuestNodePrototype, Struct } from "s2cfgtojson";
-import { markAsForkRecursively } from "../HeadlessArmors/markAsForkRecursively.mjs";
 import { deepMerge } from "../../src/deepMerge.mjs";
-import {
-  RSQLessThan3QuestNodesSIDs,
-  RSQRandomizerQuestNodesSIDs,
-  RSQSetDialogQuestNodesSIDs,
-} from "../../src/consts.mjs";
+import { RSQLessThan3QuestNodesSIDs, RSQRandomizerQuestNodesSIDs, RSQSetDialogQuestNodesSIDs } from "../../src/consts.mjs";
+import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
 
 export const meta: MetaType<Struct> = {
   description: `
@@ -65,10 +61,7 @@ transformDialogPrototypes.files = ["/DialogPrototypes/EQ197_QD_Orders.cfg"];
 
 export function transformQuestNodePrototypes(struct: QuestNodePrototype, context) {
   if (RSQLessThan3QuestNodesSIDs.has(struct.SID)) {
-    const total =
-      context.structsById[
-        RSQRandomizerQuestNodesSIDs.find((key) => !!context.structsById[key])
-      ].OutputPinNames.entries().length;
+    const total = context.structsById[RSQRandomizerQuestNodesSIDs.find((key) => !!context.structsById[key])].OutputPinNames.entries().length;
     return markAsForkRecursively(
       deepMerge(struct.fork(), {
         Conditions: new Struct({

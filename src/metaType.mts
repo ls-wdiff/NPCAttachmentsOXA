@@ -16,7 +16,7 @@ export type EntriesTransformer<T> = ((
   contents?: string[];
   files: string[];
 };
-export type MetaType<T> = {
+export type MetaType<T = Struct> = {
   changenote: string;
   description: string;
   structTransformers: EntriesTransformer<T>[];

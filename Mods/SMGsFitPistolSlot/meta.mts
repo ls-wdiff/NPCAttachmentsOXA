@@ -1,7 +1,7 @@
 import { MetaType } from "../../src/metaType.mjs";
 import { WeaponPrototype } from "s2cfgtojson";
 import { getTemplate } from "../../src/backfillDef.mts";
-import { allDefaultWeaponDefs } from "../../src/consts.mts";
+import { allDefaultWeaponPrototypesRecord } from "../../src/consts.mts";
 
 export const meta: MetaType<WeaponPrototype> = {
   description: `
@@ -18,7 +18,7 @@ bPatches WeaponPrototypes.cfg
 export function transformWeaponPrototypes(struct) {
   const fork = struct.fork();
 
-  if (getTemplate(struct, allDefaultWeaponDefs) === "TemplateSMG") {
+  if (getTemplate(struct, allDefaultWeaponPrototypesRecord) === "TemplateSMG") {
     fork.ItemSlotType = "EInventoryEquipmentSlot::Pistol";
   }
 
