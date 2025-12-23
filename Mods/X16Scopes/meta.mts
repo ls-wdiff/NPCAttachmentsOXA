@@ -12,7 +12,7 @@ bPatches AttachPrototypes, MeshPrototypes, DynamicItemGenerator, QuestItemGenera
 `,
   changenote: "Adjust spawn chance to 100%. Sleep or walk around for at least 24h to reroll their trade.",
   structTransformers: [
-    transformWeaponGeneralSetupPrototypes,
+    addX16ScopesToWeaponGeneralSetupPrototypes,
     transformAttachPrototypes,
     transformMeshPrototypes,
     transformTrade,
@@ -231,7 +231,7 @@ const getCompatibleAttachments = (struct: WeaponGeneralSetupPrototype) => {
 /**
  * Adds X16 scopes compatibility to certain guns
  */
-function transformWeaponGeneralSetupPrototypes(struct: WeaponGeneralSetupPrototype) {
+export function addX16ScopesToWeaponGeneralSetupPrototypes(struct: WeaponGeneralSetupPrototype) {
   const fork = struct.fork();
   const comp = getCompatibleAttachments(struct);
   if (comp) {
@@ -240,7 +240,7 @@ function transformWeaponGeneralSetupPrototypes(struct: WeaponGeneralSetupPrototy
     return fork;
   }
 }
-transformWeaponGeneralSetupPrototypes.files = ["/WeaponGeneralSetupPrototypes.cfg"];
+addX16ScopesToWeaponGeneralSetupPrototypes.files = ["/WeaponGeneralSetupPrototypes.cfg"];
 let transformEffectPrototypesOnce = false;
 
 function transformEffectPrototypes() {
