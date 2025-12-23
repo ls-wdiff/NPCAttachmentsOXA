@@ -6,10 +6,11 @@ import { modName, sdkModsFolder, modFolderRaw } from "./base-paths.mjs";
 import { mkdirSync } from "fs";
 import { cpSync, existsSync } from "node:fs";
 import { createMod } from "./cook.ts";
+import { recursiveCfgFindAndDelete } from "./recursive-cfg-find-and-delete.mts";
 
 const cmd = () => {
-  const destinationPath = path.join(sdkModsFolder, modName, "Content", "GameLite", "GameData");
-  const sourcePath = path.join(modFolderRaw, "Stalker2", "Content", "GameLite", "GameData");
+  const destinationPath = path.join(sdkModsFolder, modName, "Content");
+  const sourcePath = path.join(modFolderRaw, "Stalker2", "Content");
   logger.log(`Pushing raw mod from ${sourcePath} to ${destinationPath}...`);
   if (fs.readdirSync(sourcePath).length === 0) {
     console.error(`No files found in source path: ${sourcePath}`);
@@ -21,7 +22,7 @@ const cmd = () => {
   }
   if (fs.existsSync(destinationPath)) {
     logger.log(`Destination path ${destinationPath} exists... cleaning up`);
-    fs.rmSync(destinationPath, { recursive: true, force: true });
+    recursiveCfgFindAndDelete(destinationPath);
   }
   mkdirSync(destinationPath, { recursive: true });
   cpSync(path.join(sourcePath), path.join(destinationPath), { recursive: true });

@@ -3,9 +3,9 @@ import childProcess from "node:child_process";
 
 import * as fs from "node:fs";
 import { logger } from "./logger.mjs";
-import { projectRoot, modName, sdkStagedFolder, modFolder } from "./base-paths.mjs";
+import { modName, sdkStagedFolder, modFolder, sdkModsFolder } from "./base-paths.mjs";
 
-const cmd = () => {
+const copyPaks = async () => {
   const folderStructure = path.join("Stalker2", "Mods", modName, "Content", "Paks", "Windows");
   const sourcePath = path.join(sdkStagedFolder, modName, "Windows", folderStructure);
   const destinationPath = path.join(modFolder, "steamworkshop", folderStructure);
@@ -14,11 +14,28 @@ const cmd = () => {
     console.error(`No files found in source path: ${sourcePath}`);
     process.exit(1);
   }
-  return ["mkdir", "-p", destinationPath, "&&", "cp", path.join(sourcePath, "*"), destinationPath].join(" ");
+
+  childProcess.execSync(["mkdir", "-p", destinationPath, "&&", "cp", path.join(sourcePath, "*"), destinationPath].join(" "), {
+    stdio: "inherit",
+    cwd: modFolder,
+    shell: "/usr/bin/bash",
+  });
 };
 
-childProcess.execSync(cmd(), {
-  stdio: "inherit",
-  cwd: modFolder,
-  shell: "/usr/bin/bash",
-});
+const copyAssets = async () => {
+  const sourcePath = path.join(sdkModsFolder, modName, "Content");
+  const destinationPath = path.join(modFolder, "raw", "Stalker2", "Content");
+  logger.log(`Pulling asset files from ${sourcePath}...`);
+  if (fs.readdirSync(sourcePath).length === 0) {
+    console.error(`No files found in source path: ${sourcePath}`);
+    process.exit(1);
+  }
+
+  childProcess.execSync(["mkdir", "-p", destinationPath, "&&", "cp", "-r", path.join(sourcePath, "*"), destinationPath].join(" "), {
+    stdio: "inherit",
+    cwd: modFolder,
+    shell: "/usr/bin/bash",
+  });
+};
+
+await Promise.all([copyPaks(), copyAssets()]);

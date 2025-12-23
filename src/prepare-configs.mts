@@ -1,5 +1,3 @@
-console.time();
-
 import * as fs from "node:fs";
 import { spawnSync } from "child_process";
 import { modFolderRaw, modFolderSteam } from "./base-paths.mjs";
@@ -9,9 +7,15 @@ import { onL3Finish } from "./l3-cache.mjs";
 import { onL1Finish } from "./l1-cache.mjs";
 import { metaPromise } from "./metaPromise.mjs";
 import { processOneTransformer } from "./process-one-transformer.mjs";
+import { recursiveCfgFindAndDelete } from "./recursive-cfg-find-and-delete.mts";
+
+console.time();
 
 const { meta } = await metaPromise;
-if (fs.existsSync(modFolderRaw)) fs.rmSync(modFolderRaw, { recursive: true, force: true });
+
+if (fs.existsSync(modFolderRaw)) {
+  recursiveCfgFindAndDelete(modFolderRaw);
+}
 if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: true });
 
 const total = await Promise.all(meta.structTransformers.map((t) => processOneTransformer(t).finally(() => meta.onTransformerFinish?.(t))));

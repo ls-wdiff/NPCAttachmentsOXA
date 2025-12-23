@@ -5,9 +5,9 @@ import { cookMod } from "./cook.ts";
 
 validMods.map((mod) => {
   spawnNode("./prepare-configs.mts", { MOD_NAME: mod });
-  logger.log(`\n\n=== Packing Mod: ${mod} ===\n\n`);
-  cookMod(mod);
-  spawnNode("./publish-steam.mts", { MOD_NAME: mod, CHANGENOTE: "Repack for a new patch" });
+  //logger.log(`\n\n=== Packing Mod: ${mod} ===\n\n`);
+  //cookMod(mod);
+  //spawnNode("./publish-steam.mts", { MOD_NAME: mod, CHANGENOTE: "Repack for a new patch" });
 });
 
 function spawnNode(tsFile: string, env: Record<string, string>) {
