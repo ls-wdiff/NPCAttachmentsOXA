@@ -1,8 +1,9 @@
-import { DifficultyPrototype } from "s2cfgtojson";
+import { DifficultyPrototype, MutantBase } from "s2cfgtojson";
 import { MetaType } from "../../src/metaType.mjs";
+import { getTransformMobs } from "../MasterMod/transformMobs.mts";
 
 export const DIFFICULTY_FACTOR = 4;
-export const meta: MetaType<DifficultyPrototype> = {
+export const meta: MetaType<DifficultyPrototype | MutantBase> = {
   description: `
 This mode does only one thing: increases weapons damage quite a bit on Hard/Master difficulty.
 [hr][/hr]
@@ -15,8 +16,8 @@ Increases damage given and damage taken to 400%
 [hr][/hr]
 Mod is meant to be used in other collections of mods. Does not conflict with anything.
 `,
-  changenote: "Update for 1.7.1, support master difficulty",
-  structTransformers: [structTransformer],
+  changenote: "Now big mobs have 2x HP points",
+  structTransformers: [structTransformer, getTransformMobs(2, false)],
 };
 
 function structTransformer(struct: DifficultyPrototype) {

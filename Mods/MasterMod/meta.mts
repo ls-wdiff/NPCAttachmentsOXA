@@ -15,7 +15,7 @@ import { transformItemGeneratorPrototypes } from "./transformItemGeneratorProtot
 import { transformLairPrototypes } from "./transformLairPrototypes.mts";
 import { transformMeshPrototypes } from "./transformMeshPrototypes.mts";
 import { transformMeshGeneratorPrototypes } from "./transformMeshGeneratorPrototypes.mts";
-import { transformMobs } from "./transformMobs.mts";
+import { getTransformMobs } from "./transformMobs.mts";
 import { transformNPCWeaponSettingsPrototypes } from "./transformNPCWeaponSettingsPrototypes.mts";
 import { transformQuestArtifactPrototypes } from "./transformQuestArtifactPrototypes.mts";
 import { transformQuestItemPrototypes } from "./transformQuestItemPrototypes.mts";
@@ -31,6 +31,7 @@ import { transformObjPrototypes } from "./transformObjPrototypes.mts";
 import { transformQuestNodePrototypes } from "./transformQuestNodePrototypes.mts";
 import { transformWeaponPrototypes } from "./transformWeaponPrototypes.mts";
 import { MetaType } from "../../src/metaType.mts";
+import { DIFFICULTY_FACTOR } from "../GlassCannon/meta.mts";
 
 const structTransformers = [
   transformAIGlobals,
@@ -50,7 +51,7 @@ const structTransformers = [
   transformLairPrototypes,
   transformMeshGeneratorPrototypes,
   transformMeshPrototypes,
-  transformMobs,
+  getTransformMobs(DIFFICULTY_FACTOR),
   transformNPCWeaponSettingsPrototypes,
   transformObjPrototypes,
   transformQuestArtifactPrototypes,

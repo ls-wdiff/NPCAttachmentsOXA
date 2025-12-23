@@ -24,17 +24,9 @@ const preplacedDestructibleItems = [
   "D_WoodenDSPCrate_03",
 ];
 
-function transformSpawnActorPrototypes(struct: SpawnActorPrototype) {
+export function transformSpawnActorPrototypes(struct: SpawnActorPrototype) {
   const fork = struct.fork();
 
-  return transformDestructibleObjects(struct, fork);
-}
-
-transformSpawnActorPrototypes.files = ["GameLite/GameData/SpawnActorPrototypes/WorldMap_WP/"];
-transformSpawnActorPrototypes.contains = true;
-transformSpawnActorPrototypes.contents = [...preplacedDestructibleItems];
-
-function transformDestructibleObjects(struct: SpawnActorPrototype, fork: SpawnActorPrototype) {
   if (!struct.ItemGeneratorSettings?.entries?.().length) {
     return;
   }
@@ -42,3 +34,7 @@ function transformDestructibleObjects(struct: SpawnActorPrototype, fork: SpawnAc
   fork.ItemGeneratorSettings = new Struct() as any;
   return fork;
 }
+
+transformSpawnActorPrototypes.files = ["GameLite/GameData/SpawnActorPrototypes/WorldMap_WP/"];
+transformSpawnActorPrototypes.contains = true;
+transformSpawnActorPrototypes.contents = [...preplacedDestructibleItems];
