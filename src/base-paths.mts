@@ -1,14 +1,14 @@
 import path from "node:path";
 import "./ensure-dot-env.mts";
 import fs from "node:fs";
+import { projectRoot } from "./ensure-dot-env.mts";
+export { projectRoot } from "./ensure-dot-env.mts";
 
 export const rawCfgEnclosingFolder = path.join("Stalker2", "Content", "GameLite");
 export const baseCfgDir = path.join(process.env.SDK_PATH, rawCfgEnclosingFolder);
 
 export const modName = process.env.MOD_NAME;
 export const stagedFolderStruct = path.join("Stalker2", "Mods", modName, "Content", "Paks", "Windows");
-
-export const projectRoot = path.join(import.meta.dirname, "..");
 
 export const modsFolder = path.join(projectRoot, "Mods");
 export const modFolder = path.join(modsFolder, modName);
