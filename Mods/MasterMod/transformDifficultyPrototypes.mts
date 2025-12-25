@@ -1,5 +1,5 @@
 import { DifficultyPrototype, Struct } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 
 export const DIFFICULTY_FACTOR = 4;
 /**

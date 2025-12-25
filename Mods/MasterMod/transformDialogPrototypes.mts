@@ -1,8 +1,8 @@
 import { DialogPrototype, Struct } from "s2cfgtojson";
 
-import { EntriesTransformer } from "../../src/metaType.mts";
-import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
-import { deepMerge } from "../../src/deepMerge.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
+import { markAsForkRecursively } from "../../src/mark-as-fork-recursively.mts";
+import { deepMerge } from "../../src/deep-merge.mts";
 import { QuestDataTableByDialogSID, rewardFormula } from "./rewardFormula.mts";
 
 const MALACHITE_BRIBE = rewardFormula(50000).reduce((a, b) => a + b, 0) / 2;

@@ -1,8 +1,8 @@
 import { ArmorPrototype, Struct } from "s2cfgtojson";
-import { MetaContext } from "../../src/metaType.mts";
-import { backfillDef } from "../../src/backfillDef.mts";
+import { MetaContext } from "../../src/meta-type.mts";
+import { backfillDef } from "../../src/backfill-def.mts";
 import path from "node:path";
-import { deepMerge } from "../../src/deepMerge.mts";
+import { deepMerge } from "../../src/deep-merge.mts";
 import { allDefaultArmorPrototypesRecord } from "../../src/consts.mts";
 import { allExtraArmors, newArmors } from "../../src/armors.util.mts";
 

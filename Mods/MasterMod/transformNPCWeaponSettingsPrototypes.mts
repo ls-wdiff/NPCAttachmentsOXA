@@ -1,10 +1,8 @@
 import { NPCWeaponSettingsPrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { allDefaultPlayerWeaponSettingsPrototypes, allDefaultWeaponPrototypes } from "../../src/consts.mts";
 
-const playerWeaponSettingsPrototypesBySID = Object.fromEntries(
-  allDefaultPlayerWeaponSettingsPrototypes.map((s) => [s.SID, s]),
-);
+const playerWeaponSettingsPrototypesBySID = Object.fromEntries(allDefaultPlayerWeaponSettingsPrototypes.map((s) => [s.SID, s]));
 const weaponPrototypesByNPCSettingsMap = Object.fromEntries(
   allDefaultWeaponPrototypes
     .filter((s) => s.SID !== "UA_GLaunch_Weapon_Data_En" && s.SID !== "UA_GLaunch_Weapon_Data_Ru")
@@ -14,10 +12,7 @@ const weaponPrototypesByNPCSettingsMap = Object.fromEntries(
 /**
  * Transforms NPC Weapon Settings Prototypes to set default BaseDamage for Guard NPCs.
  */
-export const transformNPCWeaponSettingsPrototypes: EntriesTransformer<NPCWeaponSettingsPrototype> = async (
-  struct,
-  { structsById },
-) => {
+export const transformNPCWeaponSettingsPrototypes: EntriesTransformer<NPCWeaponSettingsPrototype> = async (struct, { structsById }) => {
   if (struct.SID.includes("Guard")) {
     let ref = structsById[struct.__internal__.refkey];
 

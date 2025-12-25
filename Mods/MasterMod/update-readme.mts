@@ -2,39 +2,9 @@ import path from "node:path";
 import { modFolder } from "../../src/base-paths.mts";
 import fs from "node:fs";
 import { logger } from "../../src/logger.mts";
+import { getModifiedFilesString } from "../../src/get-modified-files-by-folder.mts";
 
 const readmePath = path.join(modFolder, "readme.md");
-
-const modifiedFiles = new Set<string>();
-const findModifiedFiles = (p: string, parent: string) => {
-  if (p.includes("WorldMap_WP")) {
-    return;
-  }
-  if (fs.lstatSync(p).isDirectory()) {
-    for (const file of fs.readdirSync(p)) {
-      findModifiedFiles(path.join(p, file), p);
-    }
-  } else {
-    if (p.endsWith(".cfg")) {
-      modifiedFiles.add(path.relative(path.resolve(p, "..", "..", ".."), parent));
-    }
-    if (p.endsWith(".uasset")) {
-      modifiedFiles.add(`Modified assets/${path.basename(p).replace(".uasset", "")}`);
-    }
-  }
-};
-findModifiedFiles(path.join(modFolder, "raw"), modFolder);
-const modifiedFilesByFolder = [...modifiedFiles].reduce(
-  (acc, file) => {
-    const [folder, name] = file.split("/");
-    if (!acc[folder]) {
-      acc[folder] = [];
-    }
-    acc[folder].push(name);
-    return acc;
-  },
-  {} as Record<string, string[]>,
-);
 
 const readmeContent = `
 # Code generator for my Stalker 2 mod config files
@@ -63,9 +33,7 @@ const readmeContent = `
 
 Here is a list of extended files (this mod uses new files, so it is compatible with other mods that don't modify the same SIDs):
 
-${Object.entries(modifiedFilesByFolder)
-  .map(([folder, files]) => `- \`${folder}\`:\n  ${files.map((file) => `- \`${file}\``).join("\n  ")}`)
-  .join("\n")}
+${getModifiedFilesString()}
 
 ## License
 

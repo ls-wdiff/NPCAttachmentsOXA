@@ -8,11 +8,11 @@ import {
 } from "../../src/consts.mts";
 import { factions } from "../../src/factions.mts";
 import { extraArmorsByFaction, newArmors } from "../../src/armors.util.mts";
-import { allItemRank } from "../../src/allItemRank.mts";
+import { allItemRank } from "../../src/all-item-rank.mts";
 import { DynamicItemGenerator, ERank, GetStructType, Struct } from "s2cfgtojson";
 import { precision } from "../../src/precision.mts";
 import { semiRandom } from "../../src/semi-random.mts";
-import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
+import { markAsForkRecursively } from "../../src/mark-as-fork-recursively.mts";
 
 const minimumArmorCost = Object.values(allItemRank).reduce((a, b) => Math.min(a, b), Infinity);
 const maximumArmorCost = Object.values(allItemRank).reduce((a, b) => Math.max(a, b), -Infinity);
@@ -68,11 +68,7 @@ const nvgsByFaction = {
 /**
  * Allows NPCs to drop armor and helmets.
  */
-export const adjustArmorItemGenerator = (
-  struct: DynamicItemGenerator,
-  itemGenerator: DynamicItemGenerator["ItemGenerator"]["0"],
-  i: number,
-) => {
+export const adjustArmorItemGenerator = (struct: DynamicItemGenerator, itemGenerator: DynamicItemGenerator["ItemGenerator"]["0"], i: number) => {
   if (
     struct.SID.includes("WeaponPistol") ||
     struct.SID.includes("Consumables") ||
@@ -90,9 +86,7 @@ export const adjustArmorItemGenerator = (
   if (!itemGenerator.PossibleItems) {
     return;
   }
-  fork.PossibleItems = itemGenerator.PossibleItems.filter(
-    (e): e is any => !!(e[1] && allItemRank[e[1].ItemPrototypeSID]),
-  );
+  fork.PossibleItems = itemGenerator.PossibleItems.filter((e): e is any => !!(e[1] && allItemRank[e[1].ItemPrototypeSID]));
   const options = fork.PossibleItems.entries().map(([_k, v]) => v);
   const optionsBySID = Object.fromEntries(options.map((pi) => [pi.ItemPrototypeSID, pi]));
   const weights = Object.fromEntries(
@@ -135,10 +129,7 @@ export const adjustArmorItemGenerator = (
       weights[newItemSID] = getChanceForSID(allItemRank[newItemSID] ? newItemSID : originalSID);
       const maybeNewArmor = newArmors[newItemSID] as typeof descriptor;
 
-      if (
-        fork.Category ===
-        (maybeNewArmor?.__internal__._extras?.ItemGenerator?.Category || "EItemGenerationCategory::BodyArmor")
-      ) {
+      if (fork.Category === (maybeNewArmor?.__internal__._extras?.ItemGenerator?.Category || "EItemGenerationCategory::BodyArmor")) {
         fork.PossibleItems.addNode(dummyPossibleItem, newItemSID);
         if (
           maybeNewArmor ||

@@ -1,5 +1,5 @@
 import { SpawnActorPrototype, WeaponPrototype } from "s2cfgtojson";
-import { MetaContext, MetaType } from "../../src/metaType.mjs";
+import { MetaContext, MetaType } from "../../src/meta-type.mts";
 import { allDefaultAttachPrototypes } from "../../src/consts.mjs";
 import { readFileAndGetStructs } from "../../src/read-file-and-get-structs.mjs";
 import { logger } from "../../src/logger.mjs";
@@ -9,11 +9,9 @@ export const meta: MetaType<SpawnActorPrototype> = {
     This mode does only one thing: removes all 436 weapons / armors placed around the Zone[hr][/hr]
 Full scavenger mode! 
     `,
-  changenote: "Update for 1.7.1",
+  changenote: "Update for 1.8.1",
   structTransformers: [transformSpawnActorPrototypes],
-  onFinish() {
-    logger.log(totals);
-  },
+  onFinish: () => logger.log(totals),
 };
 
 /**
@@ -59,8 +57,7 @@ transformSpawnActorPrototypes.contains = true;
 transformSpawnActorPrototypes.contents = [...preplacedGear];
 
 function transformItems(struct: SpawnActorPrototype, fork: SpawnActorPrototype) {
-  const isGearReplacement =
-    preplacedGear.some((i) => struct.ItemSID?.includes(i)) && !attachmentsOrQuestItems.has(struct.ItemSID);
+  const isGearReplacement = preplacedGear.some((i) => struct.ItemSID?.includes(i)) && !attachmentsOrQuestItems.has(struct.ItemSID);
   if (!isGearReplacement) {
     return;
   }

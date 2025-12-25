@@ -1,6 +1,6 @@
 import { GetStructType } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
-import { deepMerge } from "../../src/deepMerge.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
+import { deepMerge } from "../../src/deep-merge.mts";
 
 type MeshGeneratorPrototype = GetStructType<{
   SID: string;
@@ -19,9 +19,7 @@ export const transformMeshGeneratorPrototypes: EntriesTransformer<MeshGeneratorP
 
     const newMesh = deepMerge(fork, {
       SID: `${struct.SID}_Player`,
-      Attachments: struct.Attachments.filter((e): e is any => e[0] === "BodyArmor" || e[0] === "Clo").map((e) =>
-        e[1].fork(true),
-      ),
+      Attachments: struct.Attachments.filter((e): e is any => e[0] === "BodyArmor" || e[0] === "Clo").map((e) => e[1].fork(true)),
       __internal__: {
         rawName: `${struct.SID}_Player`,
         bpatch: false,

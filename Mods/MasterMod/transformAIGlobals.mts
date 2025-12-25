@@ -1,5 +1,5 @@
 import { AIGlobal } from "s2cfgtojson";
-import { MetaContext } from "../../src/metaType.mts";
+import { MetaContext } from "../../src/meta-type.mts";
 
 export const SPAWN_BUBBLE_FACTOR = 2.5; // 100m -> 250m radius
 

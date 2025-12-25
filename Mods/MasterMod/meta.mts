@@ -30,7 +30,7 @@ import { transformWeaponGeneralSetupPrototypes } from "./transformWeaponGeneralS
 import { transformObjPrototypes } from "./transformObjPrototypes.mts";
 import { transformQuestNodePrototypes } from "./transformQuestNodePrototypes.mts";
 import { transformWeaponPrototypes } from "./transformWeaponPrototypes.mts";
-import { MetaType } from "../../src/metaType.mts";
+import { MetaType } from "../../src/meta-type.mts";
 import { DIFFICULTY_FACTOR } from "../GlassCannon/meta.mts";
 
 const structTransformers = [

@@ -1,5 +1,5 @@
 import { ConsumablePrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { MovementSpeedEffect5PTmpSID } from "./transformEffectPrototypes.mts";
 
 export const transformConsumablePrototypes: EntriesTransformer<ConsumablePrototype> = async (struct) => {

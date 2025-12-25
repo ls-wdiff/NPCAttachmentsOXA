@@ -1,6 +1,6 @@
 import { ObjPrototype } from "s2cfgtojson";
 
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { guideQuestObjectPrototypeSIDs } from "../../src/consts.mts";
 
 /**
@@ -59,6 +59,4 @@ const techniciansAndTheirTradePrototypes = new Map([
   ["banzai", "PowerPlugTechnician_TradeItemGenerator"],
 ]);
 
-const guidesAndTheirTradePrototypes = Object.fromEntries(
-  [...guideQuestObjectPrototypeSIDs].map((e) => [e, "Guide_TradePrototype"]),
-);
+const guidesAndTheirTradePrototypes = Object.fromEntries([...guideQuestObjectPrototypeSIDs].map((e) => [e, "Guide_TradePrototype"]));

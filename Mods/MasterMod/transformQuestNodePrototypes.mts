@@ -1,15 +1,11 @@
 import { QuestNodePrototype, Struct } from "s2cfgtojson";
 import { modName } from "../../src/base-paths.mts";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { getConditions, getLaunchers } from "../../src/struct-utils.mts";
-import {
-  RSQLessThan3QuestNodesSIDs,
-  RSQRandomizerQuestNodesSIDs,
-  RSQSetDialogQuestNodesSIDs,
-} from "../../src/consts.mts";
-import { deepMerge } from "../../src/deepMerge.mts";
-import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
-import { waitFor } from "../../src/waitFor.mts";
+import { RSQLessThan3QuestNodesSIDs, RSQRandomizerQuestNodesSIDs, RSQSetDialogQuestNodesSIDs } from "../../src/consts.mts";
+import { deepMerge } from "../../src/deep-merge.mts";
+import { markAsForkRecursively } from "../../src/mark-as-fork-recursively.mts";
+import { waitFor } from "../../src/wait-for.mts";
 import { finishedTransformers } from "./meta.mts";
 import { transformSpawnActorPrototypes } from "./transformSpawnActorPrototypes.mts";
 import { allStashes } from "../StashClueRework/stashes.mts";
@@ -49,11 +45,7 @@ export const transformQuestNodePrototypes: EntriesTransformer<QuestNodePrototype
     }
 
     if (struct.SID === "RSQ08_C01_K_M_Random_3") {
-      promises.push(
-        Promise.resolve(
-          Object.assign(struct.fork(), { PinWeights: Object.assign(struct.PinWeights.fork(), { 0: 0.5 }) }),
-        ),
-      );
+      promises.push(Promise.resolve(Object.assign(struct.fork(), { PinWeights: Object.assign(struct.PinWeights.fork(), { 0: 0.5 }) })));
     }
     if (struct.SID === "RSQ08_C01_K_M_Technical_STL4939_Pin_0") {
       const newConditions = Object.assign(struct.fork(), {
@@ -71,10 +63,7 @@ export const transformQuestNodePrototypes: EntriesTransformer<QuestNodePrototype
     }
 
     if (RSQLessThan3QuestNodesSIDs.has(struct.SID)) {
-      const total =
-        context.structsById[
-          RSQRandomizerQuestNodesSIDs.find((key) => !!context.structsById[key])
-        ].OutputPinNames.entries().length;
+      const total = context.structsById[RSQRandomizerQuestNodesSIDs.find((key) => !!context.structsById[key])].OutputPinNames.entries().length;
       promises.push(
         Promise.resolve(
           markAsForkRecursively(
@@ -118,17 +107,7 @@ export const transformQuestNodePrototypes: EntriesTransformer<QuestNodePrototype
   return Promise.all(promises).then((results) => results.flat());
 };
 
-const recurringQuestsFilenames = [
-  "BodyParts_Malahit",
-  "RSQ01",
-  "RSQ04",
-  "RSQ05",
-  "RSQ06",
-  "RSQ07",
-  "RSQ08",
-  "RSQ09",
-  "RSQ10",
-];
+const recurringQuestsFilenames = ["BodyParts_Malahit", "RSQ01", "RSQ04", "RSQ05", "RSQ06", "RSQ07", "RSQ08", "RSQ09", "RSQ10"];
 
 transformQuestNodePrototypes.files = ["/QuestNodePrototypes/"];
 transformQuestNodePrototypes.contents = [

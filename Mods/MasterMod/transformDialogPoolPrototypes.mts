@@ -1,14 +1,12 @@
 import { DialogPoolPrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 /**
  * Transforms DialogPoolPrototype structs to replace "SpeakToLeader" dialog events with "Hello" topics.
  */
 export const transformDialogPoolPrototypes: EntriesTransformer<DialogPoolPrototype> = async (struct) => {
   if (struct.DialogEventType === "EDialogEventType::Interact_SpeakToLeader") {
     const fork = struct.fork();
-    fork.AvailableDialogs = struct.AvailableDialogs.fork(true).map(
-      ([_, dialog]) => speakToLeaderToHelloTopicsMap[dialog] || dialog,
-    );
+    fork.AvailableDialogs = struct.AvailableDialogs.fork(true).map(([_, dialog]) => speakToLeaderToHelloTopicsMap[dialog] || dialog);
     fork.DialogEventType = "EDialogEventType::Interact_Neutral";
     return fork;
   }

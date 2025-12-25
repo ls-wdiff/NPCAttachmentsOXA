@@ -1,5 +1,5 @@
 import { UpgradePrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 
 /**
  * Unlocks blocking upgrades.
@@ -17,9 +17,7 @@ export const transformUpgradePrototypes: EntriesTransformer<UpgradePrototype> = 
     });
     fork.BlockingUpgradePrototypeSIDs.__internal__.bpatch = true;
   }
-  if (
-    struct.InterchangeableUpgradePrototypeSIDs?.entries().length /*&& !struct.AttachPrototypeSIDs?.entries().length*/
-  ) {
+  if (struct.InterchangeableUpgradePrototypeSIDs?.entries().length /*&& !struct.AttachPrototypeSIDs?.entries().length*/) {
     Object.assign(fork, {
       InterchangeableUpgradePrototypeSIDs: struct.InterchangeableUpgradePrototypeSIDs.map(() => "empty"),
     });

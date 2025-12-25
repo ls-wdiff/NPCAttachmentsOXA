@@ -1,11 +1,11 @@
 import { Struct, WeaponGeneralSetupPrototype } from "s2cfgtojson";
-import { EntriesTransformer, MetaContext } from "../../src/metaType.mts";
+import { EntriesTransformer, MetaContext } from "../../src/meta-type.mts";
 import {
   allCompatibleAttachmentDefs,
   allCompatibleAttachmentDefsByWeaponGeneralSetupPrototypeSID,
   uniqueAttachmentsToAlternatives,
 } from "./basicAttachments.mts";
-import { deepMerge } from "../../src/deepMerge.mts";
+import { deepMerge } from "../../src/deep-merge.mts";
 import { addX16ScopesToWeaponGeneralSetupPrototypes } from "../X16Scopes/meta.mts";
 
 function mapUniqueAttachmentsToGeneric(

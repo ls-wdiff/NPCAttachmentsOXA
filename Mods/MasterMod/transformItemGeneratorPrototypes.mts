@@ -1,12 +1,8 @@
 import { ItemGeneratorPrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { semiRandom } from "../../src/semi-random.mts";
-import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
-import {
-  allDefaultAmmoPrototypesRecord,
-  allDefaultConsumablePrototypesRecord,
-  allDefaultGrenadePrototypesRecord,
-} from "../../src/consts.mts";
+import { markAsForkRecursively } from "../../src/mark-as-fork-recursively.mts";
+import { allDefaultAmmoPrototypesRecord, allDefaultConsumablePrototypesRecord, allDefaultGrenadePrototypesRecord } from "../../src/consts.mts";
 
 export const transformItemGeneratorPrototypes: EntriesTransformer<ItemGeneratorPrototype> = async (struct, context) => {
   if (prohibitedIds.some((id) => struct.SID.includes(id))) {
@@ -53,10 +49,7 @@ export const transformItemGeneratorPrototypes: EntriesTransformer<ItemGeneratorP
 
   return markAsForkRecursively(Object.assign(struct.fork(), { ItemGenerator }));
 };
-transformItemGeneratorPrototypes.files = [
-  "/ItemGeneratorPrototypes.cfg",
-  "/ItemGeneratorPrototypes/Gamepass_ItemGenerators.cfg",
-];
+transformItemGeneratorPrototypes.files = ["/ItemGeneratorPrototypes.cfg", "/ItemGeneratorPrototypes/Gamepass_ItemGenerators.cfg"];
 const prohibitedIds = ["Arena"];
 
 const ammoPrototypeSIDs = new Set(Object.keys(allDefaultAmmoPrototypesRecord));

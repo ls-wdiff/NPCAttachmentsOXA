@@ -1,6 +1,6 @@
 import { WeaponPrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
-import { getTemplate } from "../../src/backfillDef.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
+import { getTemplate } from "../../src/backfill-def.mts";
 import { allDefaultWeaponPrototypesRecord } from "../../src/consts.mts";
 
 /**

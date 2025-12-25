@@ -1,5 +1,5 @@
 import { RelationPrototype } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 
 /**
  * Fixes some of the relationships

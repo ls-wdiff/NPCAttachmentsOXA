@@ -1,34 +1,29 @@
 import { ALifeDirectorScenarioPrototype, Struct } from "s2cfgtojson";
 
 import { SPAWN_BUBBLE_FACTOR } from "./transformAIGlobals.mts";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { modName } from "../../src/base-paths.mts";
-import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
+import { markAsForkRecursively } from "../../src/mark-as-fork-recursively.mts";
 
 /**
  * Transforms ALifeDirectorScenarioPrototypes to adjust NPC limits and spawn parameters.
  */
-export const transformALifeDirectorScenarioPrototypes: EntriesTransformer<ALifeDirectorScenarioPrototype> = async (
-  struct,
-  {},
-) => {
+export const transformALifeDirectorScenarioPrototypes: EntriesTransformer<ALifeDirectorScenarioPrototype> = async (struct, {}) => {
   const newStruct = struct.fork();
 
   Object.assign(newStruct, {
-    ALifeScenarioNPCArchetypesLimitsPerPlayerRank: struct.ALifeScenarioNPCArchetypesLimitsPerPlayerRank.map(
-      ([_k, e]) => {
-        const restrictionsRef = e.Restrictions;
-        restrictionsRef.addNode(
-          new Struct({ AgentType: "EAgentType::Pseudogiant", MaxCount: 1.5, __internal__: { rawName: "_" } }),
-          `${modName}_Pseudogiant`,
-        );
-        restrictionsRef.forEach(([_k, e]) => {
-          e.MaxCount ||= 1;
-          e.MaxCount *= 2;
-        });
-        return e;
-      },
-    ),
+    ALifeScenarioNPCArchetypesLimitsPerPlayerRank: struct.ALifeScenarioNPCArchetypesLimitsPerPlayerRank.map(([_k, e]) => {
+      const restrictionsRef = e.Restrictions;
+      restrictionsRef.addNode(
+        new Struct({ AgentType: "EAgentType::Pseudogiant", MaxCount: 1.5, __internal__: { rawName: "_" } }),
+        `${modName}_Pseudogiant`,
+      );
+      restrictionsRef.forEach(([_k, e]) => {
+        e.MaxCount ||= 1;
+        e.MaxCount *= 2;
+      });
+      return e;
+    }),
     RestrictedObjPrototypeSIDs: struct.RestrictedObjPrototypeSIDs.fork(true).map(([k, v]) => {
       if (v.startsWith("GeneralNPC_Spark") || v.startsWith("GeneralNPC_Scientists")) {
         struct.RestrictedObjPrototypeSIDs[k] = "GuardNPC_Duty_CloseCombat";
@@ -56,10 +51,8 @@ export const transformALifeDirectorScenarioPrototypes: EntriesTransformer<ALifeD
 
       if (v.SpawnDelayMin) v.SpawnDelayMin = Math.ceil(v.SpawnDelayMin / (5 * SPAWN_BUBBLE_FACTOR ** 2));
       if (v.SpawnDelayMax) v.SpawnDelayMax = Math.ceil(v.SpawnDelayMax / (5 * SPAWN_BUBBLE_FACTOR ** 2));
-      if (v.PostSpawnDirectorTimeoutMin)
-        v.PostSpawnDirectorTimeoutMin = Math.ceil(v.PostSpawnDirectorTimeoutMin / (5 * SPAWN_BUBBLE_FACTOR ** 2));
-      if (v.PostSpawnDirectorTimeoutMax)
-        v.PostSpawnDirectorTimeoutMax = Math.ceil(v.PostSpawnDirectorTimeoutMax / (5 * SPAWN_BUBBLE_FACTOR ** 2));
+      if (v.PostSpawnDirectorTimeoutMin) v.PostSpawnDirectorTimeoutMin = Math.ceil(v.PostSpawnDirectorTimeoutMin / (5 * SPAWN_BUBBLE_FACTOR ** 2));
+      if (v.PostSpawnDirectorTimeoutMax) v.PostSpawnDirectorTimeoutMax = Math.ceil(v.PostSpawnDirectorTimeoutMax / (5 * SPAWN_BUBBLE_FACTOR ** 2));
       return Object.assign(fork, {
         SpawnDelayMin: v.SpawnDelayMin,
         SpawnDelayMax: v.SpawnDelayMax,

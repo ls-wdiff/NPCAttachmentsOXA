@@ -1,5 +1,5 @@
 import { SpawnActorPrototype, WeaponPrototype } from "s2cfgtojson";
-import { EntriesTransformer, MetaContext } from "../../src/metaType.mts";
+import { EntriesTransformer, MetaContext } from "../../src/meta-type.mts";
 import { allDefaultAttachPrototypes } from "../../src/consts.mts";
 import { readFileAndGetStructs } from "../../src/read-file-and-get-structs.mts";
 import { logger } from "../../src/logger.mts";
@@ -89,9 +89,7 @@ transformSpawnActorPrototypes.contains = true;
 transformSpawnActorPrototypes.contents = [...preplacedDestructibleItems, "Medkit", ...preplacedGear, ...containers];
 
 function transformDestructibleObjects(struct: SpawnActorPrototype, fork: SpawnActorPrototype) {
-  if (
-    !(preplacedDestructibleItems.some((i) => struct.SpawnedPrototypeSID?.includes(i)) && struct.ItemGeneratorSettings)
-  ) {
+  if (!(preplacedDestructibleItems.some((i) => struct.SpawnedPrototypeSID?.includes(i)) && struct.ItemGeneratorSettings)) {
     return;
   }
 
@@ -126,8 +124,7 @@ function transformDestructibleObjects(struct: SpawnActorPrototype, fork: SpawnAc
 
 function transformItems(struct: SpawnActorPrototype, fork: SpawnActorPrototype) {
   const isMedkitReplacement = struct.ItemSID?.includes("Medkit") || struct.PackOfItemsPrototypeSID?.includes("Medkit");
-  const isGearReplacement =
-    preplacedGear.some((i) => struct.ItemSID?.includes(i)) && !attachmentsOrQuestItems.has(struct.ItemSID);
+  const isGearReplacement = preplacedGear.some((i) => struct.ItemSID?.includes(i)) && !attachmentsOrQuestItems.has(struct.ItemSID);
   if (!(isGearReplacement || isMedkitReplacement)) {
     return;
   }
@@ -141,11 +138,7 @@ function transformItems(struct: SpawnActorPrototype, fork: SpawnActorPrototype) 
   return Object.assign(fork, { SpawnOnStart: false }) as SpawnActorPrototype;
 }
 
-function rememberAndEmptyStash(
-  struct: SpawnActorPrototype,
-  fork: SpawnActorPrototype,
-  context: MetaContext<SpawnActorPrototype>,
-) {
+function rememberAndEmptyStash(struct: SpawnActorPrototype, fork: SpawnActorPrototype, context: MetaContext<SpawnActorPrototype>) {
   if (struct.ClueVariablePrototypeSID !== "EmptyInherited" || !containers.has(struct.SpawnedPrototypeSID)) {
     return fork;
   }

@@ -1,5 +1,5 @@
 import { AttachPrototype, Struct } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 
 const oncePerFile = new Set<string>();
 /**

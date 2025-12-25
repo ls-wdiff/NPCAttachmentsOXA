@@ -1,5 +1,5 @@
 import { EDuplicateResolveType, EEffectType, EffectPrototype, Struct } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 
 let oncePerFile = false;
 export const MovementSpeedEffect5PSID = "MovementSpeedEffect5PSID";

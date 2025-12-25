@@ -1,15 +1,10 @@
 import { Struct, TradePrototype } from "s2cfgtojson";
 
-import { EntriesTransformer } from "../../src/metaType.mts";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { precision } from "../../src/precision.mts";
 import { DIFFICULTY_FACTOR } from "./transformDifficultyPrototypes.mts";
 import { semiRandom } from "../../src/semi-random.mts";
-import {
-  bartendersTradePrototypes,
-  generalTradersTradePrototypes,
-  medicsTradePrototypes,
-  technicianTradePrototypes,
-} from "../../src/consts.mts";
+import { bartendersTradePrototypes, generalTradersTradePrototypes, medicsTradePrototypes, technicianTradePrototypes } from "../../src/consts.mts";
 
 const oncePerFile = new Set<string>();
 /**
@@ -77,17 +72,13 @@ export const transformTradePrototypes: EntriesTransformer<TradePrototype> = asyn
   const fork = struct.fork();
   if (GeneralNPCTradePrototypesMoneyMult.has(struct.SID)) {
     fork.Money = precision(
-      GeneralNPCTradePrototypesMoneyMult.get(struct.SID) *
-        DIFFICULTY_FACTOR *
-        (struct.Money ?? 1000) *
-        (semiRandom(context.index) + 1),
+      GeneralNPCTradePrototypesMoneyMult.get(struct.SID) * DIFFICULTY_FACTOR * (struct.Money ?? 1000) * (semiRandom(context.index) + 1),
       1,
     );
   }
   const TradeGenerators = struct.TradeGenerators.map(([_k, tg]) => {
     const fork = tg.fork();
-    fork.BuyLimitations =
-      tg.BuyLimitations?.fork?.() || (new Struct({ __internal__: { isArray: true, bpatch: true } }) as any);
+    fork.BuyLimitations = tg.BuyLimitations?.fork?.() || (new Struct({ __internal__: { isArray: true, bpatch: true } }) as any);
     const limitations = ["EItemType::MutantLoot"];
 
     if (bartendersTradePrototypes.has(struct.SID)) {
@@ -141,14 +132,7 @@ export const transformTradePrototypes: EntriesTransformer<TradePrototype> = asyn
 
     if (technicianTradePrototypes.has(struct.SID)) {
       limitations.push(
-        ...[
-          "EItemType::Artifact",
-          "EItemType::Armor",
-          "EItemType::Weapon",
-          "EItemType::Ammo",
-          "EItemType::Consumable",
-          "EItemType::Other",
-        ],
+        ...["EItemType::Artifact", "EItemType::Armor", "EItemType::Weapon", "EItemType::Ammo", "EItemType::Consumable", "EItemType::Other"],
       );
     }
 
@@ -164,9 +148,7 @@ export const transformTradePrototypes: EntriesTransformer<TradePrototype> = asyn
     }
     return fork;
   });
-  TradeGenerators.__internal__.useAsterisk = struct.TradeGenerators.entries().some(
-    ([_k, tg]) => tg.__internal__.rawName === "[*]",
-  );
+  TradeGenerators.__internal__.useAsterisk = struct.TradeGenerators.entries().some(([_k, tg]) => tg.__internal__.rawName === "[*]");
   TradeGenerators.__internal__.bpatch = true;
   Object.assign(fork, { TradeGenerators });
   extraStructs.push(fork);
@@ -187,11 +169,4 @@ export const GeneralNPCTradePrototypesMoneyMult = new Map([
   ["GeneralNPC_TradePrototype_Corpus", 5],
 ]);
 
-const ignoreSIDs = new Set([
-  "BaseTraderNPC_Template",
-  "BasicTrader",
-  "TraderNPC",
-  "AllTraderNPC",
-  "RC_TraderNPC",
-  "TradeTest",
-]);
+const ignoreSIDs = new Set(["BaseTraderNPC_Template", "BasicTrader", "TraderNPC", "AllTraderNPC", "RC_TraderNPC", "TradeTest"]);
