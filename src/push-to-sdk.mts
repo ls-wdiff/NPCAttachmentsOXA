@@ -6,7 +6,7 @@ import { modName, sdkModsFolder, modFolderRaw } from "./base-paths.mjs";
 import { mkdirSync } from "fs";
 import { cpSync, existsSync } from "node:fs";
 import { createMod } from "./cook.ts";
-import { recursiveCfgFindAndDelete } from "./recursive-cfg-find-and-delete.mts";
+import { recursiveCfgFind } from "./recursive-cfg-find.mts";
 
 const cmd = () => {
   const destinationPath = path.join(sdkModsFolder, modName, "Content");
@@ -22,9 +22,10 @@ const cmd = () => {
   }
   if (fs.existsSync(destinationPath)) {
     logger.log(`Destination path ${destinationPath} exists... cleaning up`);
-    recursiveCfgFindAndDelete(destinationPath);
+    recursiveCfgFind(destinationPath, (file) => fs.rmSync(file));
   }
   mkdirSync(destinationPath, { recursive: true });
+
   cpSync(path.join(sourcePath), path.join(destinationPath), { recursive: true });
   logger.log(`Done copying files to ${destinationPath}`);
 };

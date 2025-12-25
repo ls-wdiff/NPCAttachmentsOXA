@@ -1,4 +1,4 @@
-import "./ensureDotEnv.mjs";
+import "./ensure-dot-env.mts";
 import { EItemGenerationCategory, ERank, Internal } from "s2cfgtojson";
 
 import {
@@ -9,7 +9,7 @@ import {
   MASTER_RANK,
   VETERAN_MASTER_RANK,
 } from "./consts.mts";
-import { backfillDef } from "./backfillDef.mts";
+import { backfillDef } from "./backfill-def.mts";
 export type DeeplyPartial<T> = {
   [P in Exclude<keyof T, Internal | "toString">]?: T[P] extends object ? DeeplyPartial<T[P]> : T[P];
 };

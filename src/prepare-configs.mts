@@ -5,16 +5,15 @@ import { logger } from "./logger.mjs";
 import { onL2Finish } from "./l2-cache.mjs";
 import { onL3Finish } from "./l3-cache.mjs";
 import { onL1Finish } from "./l1-cache.mjs";
-import { metaPromise } from "./metaPromise.mjs";
+import { metaPromise } from "./meta-promise.mts";
 import { processOneTransformer } from "./process-one-transformer.mjs";
-import { recursiveCfgFindAndDelete } from "./recursive-cfg-find-and-delete.mts";
-
 console.time();
 
 const { meta } = await metaPromise;
 
 if (fs.existsSync(modFolderRaw)) {
-  recursiveCfgFindAndDelete(modFolderRaw);
+  fs.rmSync(modFolderRaw, { recursive: true });
+  fs.mkdirSync(modFolderRaw);
 }
 if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: true });
 

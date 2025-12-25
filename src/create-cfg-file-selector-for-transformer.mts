@@ -1,4 +1,4 @@
-import { EntriesTransformer } from "./metaType.mjs";
+import { EntriesTransformer } from "./meta-type.mts";
 import { logger } from "./logger.mjs";
 import { getCfgFiles } from "./get-cfg-files.mjs";
 import { getL2CacheKey, L2Cache, L2CacheState } from "./l2-cache.mjs";
@@ -14,8 +14,6 @@ export async function getFilesForTransformer<T>(transformer: EntriesTransformer<
   }
   L2CacheState.needsUpdate = true;
   logger.log(`Getting files for transformer ${transformer.name}...`);
-  L2Cache[cacheKey] = (
-    await Promise.all(transformer.files.map((suffix) => getCfgFiles(suffix, transformer.contains)))
-  ).flat();
+  L2Cache[cacheKey] = (await Promise.all(transformer.files.map((suffix) => getCfgFiles(suffix, transformer.contains)))).flat();
   return L2Cache[cacheKey];
 }
