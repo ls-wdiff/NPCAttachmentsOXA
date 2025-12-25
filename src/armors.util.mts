@@ -132,6 +132,7 @@ export const newArmors = {
   },
   Battle_Dolg_End_Armor_MasterMod_headless: {
     ...getHeadlessArmorCommonProps("Battle_Dolg_End_Armor"),
+    Icon: `Texture2D'/Game/GameLite/FPS_Game/UIRemaster/UITextures/Inventory/Armor/T_IFI_Battle_Dolg_End_Armor.T_IFI_Battle_Dolg_End_Armor'`,
     Cost: 70000,
   },
 

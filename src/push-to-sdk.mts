@@ -28,7 +28,15 @@ const cmd = () => {
   }
   mkdirSync(destinationPath, { recursive: true });
 
-  cpSync(path.join(sourcePath), path.join(destinationPath), { recursive: true });
+  recursiveCfgFind(sourcePath, (f, folder, shortFile) => {
+    const fromRaw = path.relative(sourcePath, folder);
+    const destinationFolder = path.join(destinationPath, fromRaw);
+    if (!existsSync(destinationFolder)) {
+      mkdirSync(destinationFolder, { recursive: true });
+    }
+    cpSync(f, path.join(destinationFolder, shortFile));
+  });
+
   logger.log(`Done copying files to ${destinationPath}`);
 };
 

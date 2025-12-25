@@ -37,7 +37,7 @@ const cmd = () => {
     "+quit",
   ].join(" ");
 };
-
+await import("./pull-assets.mjs");
 await import("./pull-staged.mjs");
 childProcess.execSync(cmd(), {
   stdio: "inherit",
