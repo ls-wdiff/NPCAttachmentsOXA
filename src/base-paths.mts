@@ -12,7 +12,9 @@ export const modFolder = path.join(modsFolder, modName);
 export const modFolderSteam = path.join(modFolder, "steamworkshop");
 export const modFolderSteamStruct = path.join(modFolderSteam, "Stalker2", "Mods", modName, "Content", "Paks", "Windows");
 export const modFolderRaw = path.join(modFolder, "raw");
+export const modFolderSdkSrc = path.join(modFolder, "sdk");
 
 export const sdkStagedFolder = path.join(process.env.SDK_PATH, "Stalker2", "SavedMods", "Staged");
 export const sdkModsFolder = path.join(process.env.SDK_PATH, "Stalker2", "Mods");
+export const sdkModFolder = path.join(sdkModsFolder, modName);
 export const validMods = fs.readdirSync(modsFolder).filter((file) => fs.statSync(path.join(modsFolder, file)).isDirectory());
