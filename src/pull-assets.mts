@@ -14,7 +14,7 @@ const pullAssets = () => {
     process.exit(1);
   }
 
-  cpSync(sourcePath, destinationPath, { recursive: true });
+  cpSync(sourcePath, destinationPath, { recursive: true, force: true });
 };
 
 pullAssets();

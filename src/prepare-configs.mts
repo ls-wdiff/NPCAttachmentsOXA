@@ -7,13 +7,14 @@ import { onL3Finish } from "./l3-cache.mjs";
 import { onL1Finish } from "./l1-cache.mjs";
 import { metaPromise } from "./meta-promise.mts";
 import { processOneTransformer } from "./process-one-transformer.mjs";
+import { recursiveCfgFind } from "./recursive-cfg-find.mts";
+import { rmSync } from "node:fs";
 console.time();
 
 const { meta } = await metaPromise;
 
 if (fs.existsSync(modFolderRaw)) {
-  fs.rmSync(modFolderRaw, { recursive: true });
-  fs.mkdirSync(modFolderRaw);
+  recursiveCfgFind(modFolderRaw, (f) => rmSync(f));
 }
 if (!fs.existsSync(modFolderSteam)) fs.mkdirSync(modFolderSteam, { recursive: true });
 
