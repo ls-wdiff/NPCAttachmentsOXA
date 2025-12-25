@@ -1,7 +1,7 @@
 import { DynamicItemGenerator, Struct } from "s2cfgtojson";
-import { EntriesTransformer } from "../../src/metaType.mjs";
+import { EntriesTransformer } from "../../src/meta-type.mts";
 import { adjustArmorItemGenerator } from "../MasterMod/adjustArmorItemGenerator.mts";
-import { addMissingCategories } from "../../src/addMissingCategories.mts";
+import { addMissingCategories } from "../../src/add-missing-categories.mts";
 
 /**
  * Allows NPCs to drop armor.
@@ -22,10 +22,7 @@ export const transformDynamicItemGenerator: EntriesTransformer<DynamicItemGenera
     }
   });
 
-  if (
-    !ItemGenerator.entries().length ||
-    !ItemGenerator.filter((e): e is any => !!(e[1].PossibleItems as Struct).entries().length).entries().length
-  ) {
+  if (!ItemGenerator.entries().length || !ItemGenerator.filter((e): e is any => !!(e[1].PossibleItems as Struct).entries().length).entries().length) {
     return;
   }
 

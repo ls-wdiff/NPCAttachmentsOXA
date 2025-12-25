@@ -1,8 +1,8 @@
-import { MetaType } from "../../src/metaType.mjs";
+import { MetaType } from "../../src/meta-type.mts";
 import { DialogPrototype, QuestNodePrototype, Struct } from "s2cfgtojson";
-import { deepMerge } from "../../src/deepMerge.mjs";
+import { deepMerge } from "../../src/deep-merge.mts";
 import { RSQLessThan3QuestNodesSIDs, RSQRandomizerQuestNodesSIDs, RSQSetDialogQuestNodesSIDs } from "../../src/consts.mjs";
-import { markAsForkRecursively } from "../../src/markAsForkRecursively.mts";
+import { markAsForkRecursively } from "../../src/mark-as-fork-recursively.mts";
 
 export const meta: MetaType<Struct> = {
   description: `

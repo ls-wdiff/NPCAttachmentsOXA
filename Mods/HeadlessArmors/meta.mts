@@ -1,7 +1,7 @@
 import path from "node:path";
 import dotEnv from "dotenv";
 import { transformDynamicItemGenerator } from "./transformDynamicItemGenerator.mjs";
-import { MetaType } from "../../src/metaType.mjs";
+import { MetaType } from "../../src/meta-type.mts";
 import { ArmorPrototype, DynamicItemGenerator } from "s2cfgtojson";
 import { transformArmorPrototypes } from "../MasterMod/transformArmorPrototypes.mts";
 
@@ -53,7 +53,6 @@ export const meta: MetaType<ArmorPrototype | DynamicItemGenerator> = {
    [h2][/h2]
    Modified configs through refkeys: DynamicItemGenerator.cfg and ArmorPrototypes.cfg
   `,
-  changenote:
-    "More variety in armor loadouts on later difficulties. Reworked a lot of backend systems to support easier extension.",
+  changenote: "More variety in armor loadouts on later difficulties. Reworked a lot of backend systems to support easier extension.",
   structTransformers: [transformArmorPrototypes, transformDynamicItemGenerator],
 };

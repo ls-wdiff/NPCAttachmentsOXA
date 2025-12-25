@@ -1,4 +1,4 @@
-import { MetaType } from "../../src/metaType.mjs";
+import { MetaType } from "../../src/meta-type.mts";
 import { SpawnActorPrototype } from "s2cfgtojson";
 import { transformSpawnActorPrototypes } from "../CratesDontDropAnything/meta.mts";
 
